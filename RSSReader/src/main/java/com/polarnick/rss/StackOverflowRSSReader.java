@@ -25,6 +25,15 @@ public class StackOverflowRSSReader {
     private static final String ENCODING_CHARSET = "UTF-8";
 
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final String FEED_TAG = "feed";
+    private static final String ENTRY_TAG = "entry";
+    private static final String LINK_TAG = "link";
+    private static final String LINK_ATTRIBUTE_NAME = "href";
+    private static final String TITLE_TAG = "title";
+    private static final String PUBLISHED_TAG = "published";
+    private static final String UPDATED_TAG = "updated";
+    private static final String RANK_TAG = "re:rank";
+
     private final XmlPullParser parser;
 
     public StackOverflowRSSReader() throws XmlPullParserException {
@@ -38,14 +47,14 @@ public class StackOverflowRSSReader {
         parser.setInput(httpResponse.getEntity().getContent(), ENCODING_CHARSET);
 
         Preconditions.checkState(parser.getEventType() == XmlPullParser.START_DOCUMENT);
-        Preconditions.checkState(parser.next() == XmlPullParser.START_TAG && "feed".equals(parser.getName()));
+        Preconditions.checkState(parser.next() == XmlPullParser.START_TAG && FEED_TAG.equals(parser.getName()));
         Feed feed = readFeed(parser);
         Preconditions.checkState(parser.next() == XmlPullParser.END_DOCUMENT);
         return feed;
     }
 
     private Feed readFeed(XmlPullParser parser) throws XmlPullParserException, IOException, ParseException {
-        Preconditions.checkState(parser.getEventType() == XmlPullParser.START_TAG && "feed".equals(parser.getName()));
+        Preconditions.checkState(parser.getEventType() == XmlPullParser.START_TAG && FEED_TAG.equals(parser.getName()));
 
         Feed feed = new Feed();
         int eventType = parser.next();
@@ -54,21 +63,22 @@ public class StackOverflowRSSReader {
             if (eventType == XmlPullParser.START_TAG) {
                 level++;
             }
-            if (eventType == XmlPullParser.START_TAG && level == 1 && "entry".equals(parser.getName())) {
+            if (eventType == XmlPullParser.START_TAG && level == 1 && ENTRY_TAG.equals(parser.getName())) {
                 FeedEntry entry = readEntry(parser);
                 feed.addEntry(entry);
+                eventType = parser.getEventType();
             }
-            if (parser.getEventType() == XmlPullParser.END_TAG) {
+            if (eventType == XmlPullParser.END_TAG) {
                 level--;
             }
             eventType = parser.next();
         }
-        Preconditions.checkState(parser.getEventType() == XmlPullParser.END_TAG && "feed".equals(parser.getName()));
+        Preconditions.checkState(parser.getEventType() == XmlPullParser.END_TAG && FEED_TAG.equals(parser.getName()));
         return feed;
     }
 
     private FeedEntry readEntry(XmlPullParser parser) throws XmlPullParserException, IOException, ParseException {
-        Preconditions.checkState(parser.getEventType() == XmlPullParser.START_TAG && "entry".equals(parser.getName()));
+        Preconditions.checkState(parser.getEventType() == XmlPullParser.START_TAG && ENTRY_TAG.equals(parser.getName()));
 
         FeedEntry entry = new FeedEntry();
         int eventType = parser.next();
@@ -84,15 +94,15 @@ public class StackOverflowRSSReader {
                 }
                 level++;
             }
-            if (eventType == XmlPullParser.START_TAG && level == 1 && "link".equals(parser.getName())) {
-                entry.setLink(parser.getAttributeValue(null, "href"));
-            } else if (eventType == XmlPullParser.TEXT && level == 1 && "title".equals(tagsStack.get(level - 1))) {
+            if (eventType == XmlPullParser.START_TAG && level == 1 && LINK_TAG.equals(parser.getName())) {
+                entry.setLink(parser.getAttributeValue(null, LINK_ATTRIBUTE_NAME));
+            } else if (eventType == XmlPullParser.TEXT && level == 1 && TITLE_TAG.equals(tagsStack.get(level - 1))) {
                 entry.setTitle(parser.getText());
-            } else if (eventType == XmlPullParser.TEXT && level == 1 && "published".equals(tagsStack.get(level - 1))) {
+            } else if (eventType == XmlPullParser.TEXT && level == 1 && PUBLISHED_TAG.equals(tagsStack.get(level - 1))) {
                 entry.setPublishedDate(dateFormat.parse(parser.getText()));
-            } else if (eventType == XmlPullParser.TEXT && level == 1 && "updated".equals(tagsStack.get(level - 1))) {
+            } else if (eventType == XmlPullParser.TEXT && level == 1 && UPDATED_TAG.equals(tagsStack.get(level - 1))) {
                 entry.setUpdatedDate(dateFormat.parse(parser.getText()));
-            } else if (eventType == XmlPullParser.TEXT && level == 1 && "re:rank".equals(tagsStack.get(level - 1))) {
+            } else if (eventType == XmlPullParser.TEXT && level == 1 && RANK_TAG.equals(tagsStack.get(level - 1))) {
                 entry.setRank(Integer.parseInt(parser.getText()));
             }
             if (eventType == XmlPullParser.END_TAG) {
@@ -101,7 +111,7 @@ public class StackOverflowRSSReader {
             }
             eventType = parser.next();
         }
-        Preconditions.checkState(parser.getEventType() == XmlPullParser.END_TAG && "entry".equals(parser.getName()));
+        Preconditions.checkState(parser.getEventType() == XmlPullParser.END_TAG && ENTRY_TAG.equals(parser.getName()));
         return entry;
     }
 
