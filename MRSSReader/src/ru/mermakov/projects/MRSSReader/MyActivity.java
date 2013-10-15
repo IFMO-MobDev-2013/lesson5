@@ -3,26 +3,19 @@ package ru.mermakov.projects.MRSSReader;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-
 public class MyActivity extends Activity {
-    private String RSSFEEDURL = "http://www.mobilenations.com/rss/mb.xml";
-    //private String RSSFEEDURL = "http://news.yandex.ru/computers.rss";
+    private String RSSFEEDURL = "http://news.yandex.ru/computers.rss";
     RSSFeed feed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.main);
-
         ConnectivityManager conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr.getActiveNetworkInfo() == null
                 || !conMgr.getActiveNetworkInfo().isConnected()
@@ -32,18 +25,10 @@ public class MyActivity extends Activity {
             builder.setMessage(
                     "Unable to reach server, \nPlease check your connectivity.")
                     .setTitle("MRSSReader")
-                    .setCancelable(false)
-                    .setPositiveButton("Exit",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int id) {
-                                    finish();
-                                }
-                            });
-
+                    .setCancelable(false);
             AlertDialog alert = builder.create();
             alert.show();
+
 
         } else {
             new AsyncLoadXMLFeed().execute();
@@ -57,7 +42,6 @@ public class MyActivity extends Activity {
             feed = myParser.parseXml(RSSFEEDURL);
             String line;
             return null;
-
         }
 
         @Override

@@ -11,7 +11,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,12 +52,11 @@ public class FeedActivity extends Activity {
         lv.setOnRefreshListener(new RefreshingListView.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                AsyncLoadXMLFeed task=new AsyncLoadXMLFeed();
+                AsyncLoadXMLFeed task = new AsyncLoadXMLFeed();
                 task.execute();
                 try {
-                task.get();
-                }
-                catch (Exception er){
+                    task.get();
+                } catch (Exception er) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(FeedActivity.this);
                     builder.setMessage(
                             "Unable to reach server, \nPlease check your connectivity.")
@@ -73,7 +75,7 @@ public class FeedActivity extends Activity {
                     alert.show();
                 }
                 lv.setVerticalFadingEdgeEnabled(true);
-                adapter=new CustomListAdapter(FeedActivity.this);
+                adapter = new CustomListAdapter(FeedActivity.this);
                 lv.setAdapter(adapter);
 
                 lv.postDelayed(new Runnable() {
@@ -81,18 +83,13 @@ public class FeedActivity extends Activity {
                     public void run() {
                         lv.onRefreshComplete();
                     }
-                },2000);
+                }, 2000);
             }
         });
-        // Set on item click listener to the ListView
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-                                    long arg3) {
-                // actions to be performed when a list item clicked
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
                 int pos = arg2;
-
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("feed", feed);
                 Intent intent = new Intent(FeedActivity.this,
@@ -100,7 +97,6 @@ public class FeedActivity extends Activity {
                 intent.putExtras(bundle);
                 intent.putExtra("pos", pos);
                 startActivity(intent);
-
             }
         });
 
@@ -114,21 +110,15 @@ public class FeedActivity extends Activity {
     }
 
     class CustomListAdapter extends BaseAdapter {
-
         private LayoutInflater layoutInflater;
         public ImageLoader imageLoader;
-
         public CustomListAdapter(FeedActivity activity) {
-
-            layoutInflater = (LayoutInflater) activity
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             imageLoader = new ImageLoader(activity.getApplicationContext());
         }
 
         @Override
         public int getCount() {
-
-            // Set the total list item count
             return feed.getItemCount();
         }
 
@@ -144,25 +134,17 @@ public class FeedActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
-            // Inflate the item layout and set the views
             View listItem = convertView;
             int pos = position;
             if (listItem == null) {
                 listItem = layoutInflater.inflate(R.layout.list_item, null);
             }
-
-            // Initialize the views in the layout
             ImageView iv = (ImageView) listItem.findViewById(R.id.thumb);
             TextView tvTitle = (TextView) listItem.findViewById(R.id.title);
             TextView tvDate = (TextView) listItem.findViewById(R.id.date);
-
-            // Set the views in the layout
             imageLoader.DisplayImage(feed.getItem(pos).getImage(), iv);
             tvTitle.setText(feed.getItem(pos).getTitle());
-            tvDate.setText(feed.getItem(pos).getDate());
-
-            return listItem;
+            tvDate.setText(feed.getItem(pos).getDate());            return listItem;
         }
 
     }
@@ -171,11 +153,11 @@ public class FeedActivity extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             DOMParser myParser = new DOMParser();
-            feed = myParser.parseXml("http://www.mobilenations.com/rss/mb.xml");
+            feed = myParser.parseXml("http://news.yandex.ru/computers.rss");
             String line;
             return null;
-
         }
+
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);

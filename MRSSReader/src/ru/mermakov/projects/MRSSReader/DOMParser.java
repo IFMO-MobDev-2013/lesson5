@@ -41,7 +41,6 @@ public class DOMParser {
             int length2 = n2.getLength();
 
 
-
             for (int i = 0; i < length; i++) {
                 Node currentNode = nl.item(i);
                 RSSItem item = new RSSItem();
@@ -63,27 +62,21 @@ public class DOMParser {
                             // Node name is equals to 'title' so set the Node
                             // value to the Title in the RSSItem.
                             item.setTitle(theString);
-                        }
-
-                        else if ("description".equals(nodeName)) {
+                        } else if ("description".equals(nodeName)) {
                             item.setDescription(theString);
                             String html = theString;
                             org.jsoup.nodes.Document docHtml = Jsoup
                                     .parse(html);
                             Elements imgEle = docHtml.select("img");
                             item.setImage(imgEle.attr("src"));
-                        }
-
-                        else if ("pubDate".equals(nodeName)) {
+                        } else if ("pubDate".equals(nodeName)) {
 
                             // We replace the plus and zero's in the date with
                             // empty string
                             String formatedDate = theString.replace(" +0000",
                                     "");
                             item.setDate(formatedDate);
-                        }
-
-                        else if("link".equals(nodeName)) {
+                        } else if ("link".equals(nodeName)) {
                             item.setLink(theString);
                         }
 

@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.view.*;
 import android.view.animation.*;
 import android.widget.*;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -28,14 +29,14 @@ import java.util.Date;
  * @author Erik Wallentinsen <dev+ptr@erikw.eu>
  * @version 1.3.0
  */
-public class RefreshingListView extends ListView{
-    private static final float PULL_RESISTANCE                 = 1.7f;
-    private static final int   BOUNCE_ANIMATION_DURATION       = 700;
-    private static final int   BOUNCE_ANIMATION_DELAY          = 100;
-    private static final float BOUNCE_OVERSHOOT_TENSION        = 1.4f;
-    private static final int   ROTATE_ARROW_ANIMATION_DURATION = 250;
+public class RefreshingListView extends ListView {
+    private static final float PULL_RESISTANCE = 1.7f;
+    private static final int BOUNCE_ANIMATION_DURATION = 700;
+    private static final int BOUNCE_ANIMATION_DELAY = 100;
+    private static final float BOUNCE_OVERSHOOT_TENSION = 1.4f;
+    private static final int ROTATE_ARROW_ANIMATION_DURATION = 250;
 
-    private static enum State{
+    private static enum State {
         PULL_TO_REFRESH,
         RELEASE_TO_REFRESH,
         REFRESHING
@@ -46,7 +47,7 @@ public class RefreshingListView extends ListView{
      * events.
      * Call setOnRefreshListener(..) to activate an OnRefreshListener.
      */
-    public interface OnRefreshListener{
+    public interface OnRefreshListener {
 
         /**
          * Method to be called when a refresh is requested
@@ -60,54 +61,54 @@ public class RefreshingListView extends ListView{
     private boolean bounceBackHeader;
     private boolean lockScrollWhileRefreshing;
     private boolean showLastUpdatedText;
-    private String  pullToRefreshText;
-    private String  releaseToRefreshText;
-    private String  refreshingText;
-    private String  lastUpdatedText;
+    private String pullToRefreshText;
+    private String releaseToRefreshText;
+    private String refreshingText;
+    private String lastUpdatedText;
     private SimpleDateFormat lastUpdatedDateFormat = new SimpleDateFormat("dd/MM HH:mm");
 
-    private float                   previousY;
-    private int                     headerPadding;
-    private boolean                 hasResetHeader;
-    private long                    lastUpdated = -1;
-    private State                   state;
+    private float previousY;
+    private int headerPadding;
+    private boolean hasResetHeader;
+    private long lastUpdated = -1;
+    private State state;
     private LinearLayout headerContainer;
     private RelativeLayout header;
     private RotateAnimation flipAnimation;
-    private RotateAnimation         reverseFlipAnimation;
+    private RotateAnimation reverseFlipAnimation;
     private ImageView image;
     private ProgressBar spinner;
-    private TextView                text;
-    private TextView                lastUpdatedTextView;
-    private OnItemClickListener     onItemClickListener;
+    private TextView text;
+    private TextView lastUpdatedTextView;
+    private OnItemClickListener onItemClickListener;
     private OnItemLongClickListener onItemLongClickListener;
-    private OnRefreshListener       onRefreshListener;
+    private OnRefreshListener onRefreshListener;
 
     private float mScrollStartY;
     private final int IDLE_DISTANCE = 5;
 
-    public RefreshingListView(Context context){
+    public RefreshingListView(Context context) {
         super(context);
         init();
     }
 
-    public RefreshingListView(Context context, AttributeSet attrs){
+    public RefreshingListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public RefreshingListView(Context context, AttributeSet attrs, int defStyle){
+    public RefreshingListView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
 
     @Override
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
     @Override
-    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener){
+    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
         this.onItemLongClickListener = onItemLongClickListener;
     }
 
@@ -117,14 +118,14 @@ public class RefreshingListView extends ListView{
      *
      * @param onRefreshListener The OnRefreshListener to get notified
      */
-    public void setOnRefreshListener(OnRefreshListener onRefreshListener){
+    public void setOnRefreshListener(OnRefreshListener onRefreshListener) {
         this.onRefreshListener = onRefreshListener;
     }
 
     /**
      * @return If the list is in 'Refreshing' state
      */
-    public boolean isRefreshing(){
+    public boolean isRefreshing() {
         return state == State.REFRESHING;
     }
 
@@ -134,7 +135,7 @@ public class RefreshingListView extends ListView{
      *
      * @param lockScrollWhileRefreshing
      */
-    public void setLockScrollWhileRefreshing(boolean lockScrollWhileRefreshing){
+    public void setLockScrollWhileRefreshing(boolean lockScrollWhileRefreshing) {
         this.lockScrollWhileRefreshing = lockScrollWhileRefreshing;
     }
 
@@ -144,9 +145,9 @@ public class RefreshingListView extends ListView{
      *
      * @param showLastUpdatedText
      */
-    public void setShowLastUpdatedText(boolean showLastUpdatedText){
+    public void setShowLastUpdatedText(boolean showLastUpdatedText) {
         this.showLastUpdatedText = showLastUpdatedText;
-        if(!showLastUpdatedText) lastUpdatedTextView.setVisibility(View.GONE);
+        if (!showLastUpdatedText) lastUpdatedTextView.setVisibility(View.GONE);
     }
 
     /**
@@ -156,7 +157,7 @@ public class RefreshingListView extends ListView{
      *
      * @param lastUpdatedDateFormat
      */
-    public void setLastUpdatedDateFormat(SimpleDateFormat lastUpdatedDateFormat){
+    public void setLastUpdatedDateFormat(SimpleDateFormat lastUpdatedDateFormat) {
         this.lastUpdatedDateFormat = lastUpdatedDateFormat;
     }
 
@@ -165,7 +166,7 @@ public class RefreshingListView extends ListView{
      * is useful when you want to show the spinner and 'Refreshing' text when
      * the refresh was not triggered by 'pull to refresh', for example on start.
      */
-    public void setRefreshing(){
+    public void setRefreshing() {
         state = State.REFRESHING;
         scrollTo(0, 0);
         setUiRefreshing();
@@ -176,7 +177,7 @@ public class RefreshingListView extends ListView{
      * Set the state back to 'pull to refresh'. Call this method when refreshing
      * the data is finished.
      */
-    public void onRefreshComplete(){
+    public void onRefreshComplete() {
         state = State.PULL_TO_REFRESH;
         resetHeader();
         lastUpdated = System.currentTimeMillis();
@@ -187,9 +188,9 @@ public class RefreshingListView extends ListView{
      *
      * @param pullToRefreshText Text
      */
-    public void setTextPullToRefresh(String pullToRefreshText){
+    public void setTextPullToRefresh(String pullToRefreshText) {
         this.pullToRefreshText = pullToRefreshText;
-        if(state == State.PULL_TO_REFRESH){
+        if (state == State.PULL_TO_REFRESH) {
             text.setText(pullToRefreshText);
         }
     }
@@ -199,9 +200,9 @@ public class RefreshingListView extends ListView{
      *
      * @param releaseToRefreshText Text
      */
-    public void setTextReleaseToRefresh(String releaseToRefreshText){
+    public void setTextReleaseToRefresh(String releaseToRefreshText) {
         this.releaseToRefreshText = releaseToRefreshText;
-        if(state == State.RELEASE_TO_REFRESH){
+        if (state == State.RELEASE_TO_REFRESH) {
             text.setText(releaseToRefreshText);
         }
     }
@@ -211,14 +212,14 @@ public class RefreshingListView extends ListView{
      *
      * @param refreshingText Text
      */
-    public void setTextRefreshing(String refreshingText){
+    public void setTextRefreshing(String refreshingText) {
         this.refreshingText = refreshingText;
-        if(state == State.REFRESHING){
+        if (state == State.REFRESHING) {
             text.setText(refreshingText);
         }
     }
 
-    private void init(){
+    private void init() {
         setVerticalFadingEdgeEnabled(false);
 
         headerContainer = (LinearLayout) LayoutInflater.from(getContext()).inflate(R.layout.ptr_header, null);
@@ -254,7 +255,7 @@ public class RefreshingListView extends ListView{
         super.setOnItemLongClickListener(new PTROnItemLongClickListener());
     }
 
-    private void setHeaderPadding(int padding){
+    private void setHeaderPadding(int padding) {
         headerPadding = padding;
 
         MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
@@ -263,18 +264,17 @@ public class RefreshingListView extends ListView{
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event){
-        if(lockScrollWhileRefreshing
-                && (state == State.REFRESHING || getAnimation() != null && !getAnimation().hasEnded())){
+    public boolean onTouchEvent(MotionEvent event) {
+        if (lockScrollWhileRefreshing
+                && (state == State.REFRESHING || getAnimation() != null && !getAnimation().hasEnded())) {
             return true;
         }
 
-        switch(event.getAction()){
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                if(getFirstVisiblePosition() == 0){
+                if (getFirstVisiblePosition() == 0) {
                     previousY = event.getY();
-                }
-                else {
+                } else {
                     previousY = -1;
                 }
 
@@ -284,8 +284,8 @@ public class RefreshingListView extends ListView{
                 break;
 
             case MotionEvent.ACTION_UP:
-                if(previousY != -1 && (state == State.RELEASE_TO_REFRESH || getFirstVisiblePosition() == 0)){
-                    switch(state){
+                if (previousY != -1 && (state == State.RELEASE_TO_REFRESH || getFirstVisiblePosition() == 0)) {
+                    switch (state) {
                         case RELEASE_TO_REFRESH:
                             setState(State.REFRESHING);
                             bounceBackHeader();
@@ -300,23 +300,23 @@ public class RefreshingListView extends ListView{
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                if(previousY != -1 && getFirstVisiblePosition() == 0 && Math.abs(mScrollStartY-event.getY()) > IDLE_DISTANCE){
+                if (previousY != -1 && getFirstVisiblePosition() == 0 && Math.abs(mScrollStartY - event.getY()) > IDLE_DISTANCE) {
                     float y = event.getY();
                     float diff = y - previousY;
-                    if(diff > 0) diff /= PULL_RESISTANCE;
+                    if (diff > 0) diff /= PULL_RESISTANCE;
                     previousY = y;
 
                     int newHeaderPadding = Math.max(Math.round(headerPadding + diff), -header.getHeight());
 
-                    if(newHeaderPadding != headerPadding && state != State.REFRESHING){
+                    if (newHeaderPadding != headerPadding && state != State.REFRESHING) {
                         setHeaderPadding(newHeaderPadding);
 
-                        if(state == State.PULL_TO_REFRESH && headerPadding > 0){
+                        if (state == State.PULL_TO_REFRESH && headerPadding > 0) {
                             setState(State.RELEASE_TO_REFRESH);
 
                             image.clearAnimation();
                             image.startAnimation(flipAnimation);
-                        }else if(state == State.RELEASE_TO_REFRESH && headerPadding < 0){
+                        } else if (state == State.RELEASE_TO_REFRESH && headerPadding < 0) {
                             setState(State.PULL_TO_REFRESH);
 
                             image.clearAnimation();
@@ -331,10 +331,11 @@ public class RefreshingListView extends ListView{
         return super.onTouchEvent(event);
     }
 
-    private void bounceBackHeader(){
+    private void bounceBackHeader() {
         int yTranslate = state == State.REFRESHING ?
                 header.getHeight() - headerContainer.getHeight() :
-                -headerContainer.getHeight() - headerContainer.getTop() + getPaddingTop();;
+                -headerContainer.getHeight() - headerContainer.getTop() + getPaddingTop();
+        ;
 
         TranslateAnimation bounceAnimation = new TranslateAnimation(
                 TranslateAnimation.ABSOLUTE, 0,
@@ -352,36 +353,36 @@ public class RefreshingListView extends ListView{
         startAnimation(bounceAnimation);
     }
 
-    private void resetHeader(){
-        if(getFirstVisiblePosition() > 0){
+    private void resetHeader() {
+        if (getFirstVisiblePosition() > 0) {
             setHeaderPadding(-header.getHeight());
             setState(State.PULL_TO_REFRESH);
             return;
         }
 
-        if(getAnimation() != null && !getAnimation().hasEnded()){
+        if (getAnimation() != null && !getAnimation().hasEnded()) {
             bounceBackHeader = true;
-        }else{
+        } else {
             bounceBackHeader();
         }
     }
 
-    private void setUiRefreshing(){
+    private void setUiRefreshing() {
         spinner.setVisibility(View.VISIBLE);
         image.clearAnimation();
         image.setVisibility(View.INVISIBLE);
         text.setText(refreshingText);
     }
 
-    private void setState(State state){
+    private void setState(State state) {
         this.state = state;
-        switch(state){
+        switch (state) {
             case PULL_TO_REFRESH:
                 spinner.setVisibility(View.INVISIBLE);
                 image.setVisibility(View.VISIBLE);
                 text.setText(pullToRefreshText);
 
-                if(showLastUpdatedText && lastUpdated != -1){
+                if (showLastUpdatedText && lastUpdated != -1) {
                     lastUpdatedTextView.setVisibility(View.VISIBLE);
                     lastUpdatedTextView.setText(String.format(lastUpdatedText, lastUpdatedDateFormat.format(new Date(lastUpdated))));
                 }
@@ -398,9 +399,9 @@ public class RefreshingListView extends ListView{
                 setUiRefreshing();
 
                 lastUpdated = System.currentTimeMillis();
-                if(onRefreshListener == null){
+                if (onRefreshListener == null) {
                     setState(State.PULL_TO_REFRESH);
-                }else{
+                } else {
                     onRefreshListener.onRefresh();
                 }
 
@@ -409,11 +410,11 @@ public class RefreshingListView extends ListView{
     }
 
     @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt){
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
 
-        if(!hasResetHeader){
-            if(measuredHeaderHeight > 0 && state != State.REFRESHING){
+        if (!hasResetHeader) {
+            if (measuredHeaderHeight > 0 && state != State.REFRESHING) {
                 setHeaderPadding(-measuredHeaderHeight);
             }
 
@@ -426,12 +427,12 @@ public class RefreshingListView extends ListView{
         private int height, translation;
         private State stateAtAnimationStart;
 
-        public HeaderAnimationListener(int translation){
+        public HeaderAnimationListener(int translation) {
             this.translation = translation;
         }
 
         @Override
-        public void onAnimationStart(Animation animation){
+        public void onAnimationStart(Animation animation) {
             stateAtAnimationStart = state;
 
             android.view.ViewGroup.LayoutParams lp = getLayoutParams();
@@ -439,13 +440,13 @@ public class RefreshingListView extends ListView{
             lp.height = getHeight() - translation;
             setLayoutParams(lp);
 
-            if(scrollbarEnabled){
+            if (scrollbarEnabled) {
                 setVerticalScrollBarEnabled(false);
             }
         }
 
         @Override
-        public void onAnimationEnd(Animation animation){
+        public void onAnimationEnd(Animation animation) {
             setHeaderPadding(stateAtAnimationStart == State.REFRESHING ? 0 : -measuredHeaderHeight - headerContainer.getTop());
             setSelection(0);
 
@@ -453,39 +454,40 @@ public class RefreshingListView extends ListView{
             lp.height = height;
             setLayoutParams(lp);
 
-            if(scrollbarEnabled){
+            if (scrollbarEnabled) {
                 setVerticalScrollBarEnabled(true);
             }
 
-            if(bounceBackHeader){
+            if (bounceBackHeader) {
                 bounceBackHeader = false;
 
-                postDelayed(new Runnable(){
+                postDelayed(new Runnable() {
 
                     @Override
-                    public void run(){
+                    public void run() {
                         resetHeader();
                     }
                 }, BOUNCE_ANIMATION_DELAY);
-            }else if(stateAtAnimationStart != State.REFRESHING){
+            } else if (stateAtAnimationStart != State.REFRESHING) {
                 setState(State.PULL_TO_REFRESH);
             }
         }
 
         @Override
-        public void onAnimationRepeat(Animation animation){}
+        public void onAnimationRepeat(Animation animation) {
+        }
     }
 
     private class PTROnGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
 
         @Override
-        public void onGlobalLayout(){
+        public void onGlobalLayout() {
             int initialHeaderHeight = header.getHeight();
 
-            if(initialHeaderHeight > 0){
+            if (initialHeaderHeight > 0) {
                 measuredHeaderHeight = initialHeaderHeight;
 
-                if(measuredHeaderHeight > 0 && state != State.REFRESHING){
+                if (measuredHeaderHeight > 0 && state != State.REFRESHING) {
                     setHeaderPadding(-measuredHeaderHeight);
                     requestLayout();
                 }
@@ -495,26 +497,26 @@ public class RefreshingListView extends ListView{
         }
     }
 
-    private class PTROnItemClickListener implements OnItemClickListener{
+    private class PTROnItemClickListener implements OnItemClickListener {
 
         @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id){
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
             hasResetHeader = false;
 
-            if(onItemClickListener != null && state == State.PULL_TO_REFRESH){
+            if (onItemClickListener != null && state == State.PULL_TO_REFRESH) {
                 // Passing up onItemClick. Correct position with the number of header views
                 onItemClickListener.onItemClick(adapterView, view, position - getHeaderViewsCount(), id);
             }
         }
     }
 
-    private class PTROnItemLongClickListener implements OnItemLongClickListener{
+    private class PTROnItemLongClickListener implements OnItemLongClickListener {
 
         @Override
-        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id){
+        public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
             hasResetHeader = false;
 
-            if(onItemLongClickListener != null && state == State.PULL_TO_REFRESH){
+            if (onItemLongClickListener != null && state == State.PULL_TO_REFRESH) {
                 // Passing up onItemLongClick. Correct position with the number of header views
                 return onItemLongClickListener.onItemLongClick(adapterView, view, position - getHeaderViewsCount(), id);
             }

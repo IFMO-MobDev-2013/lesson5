@@ -8,7 +8,7 @@ public class RSSItem implements Serializable {
     private String description = null;
     private String date = null;
     private String image = null;
-    private String link=null;
+    private String link = null;
 
     void setTitle(String title) {
         this.title = title;
@@ -27,7 +27,7 @@ public class RSSItem implements Serializable {
     }
 
     void setLink(String link) {
-        this.link=link;
+        this.link = link;
     }
 
     public String getTitle() {

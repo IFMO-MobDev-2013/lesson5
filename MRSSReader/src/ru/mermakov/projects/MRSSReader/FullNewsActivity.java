@@ -30,8 +30,8 @@ public class FullNewsActivity extends Activity {
         ws.setJavaScriptEnabled(true);
         ws.setBuiltInZoomControls(true);
         title.setText(feed.getItem(pos).getTitle());
-        if(feed.getItem(pos).getLink()!=null)
-            desc.loadDataWithBaseURL("http://yandex.ru", feed.getItem(pos).getDescription()+"<p><a href="+feed.getItem(pos).getLink()+">Link to the news</a></p>","text/html","UTF-8",null);
+        if (feed.getItem(pos).getLink() != null)
+            desc.loadDataWithBaseURL("http://yandex.ru", feed.getItem(pos).getDescription() + "<p><a href=" + feed.getItem(pos).getLink() + ">Link to the news</a></p>", "text/html", "UTF-8", null);
         else
             desc.loadDataWithBaseURL("http://www.yandex.ru/", feed
                     .getItem(pos).getDescription(), "text/html", "UTF-8", null);
