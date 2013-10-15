@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">lesson5</string>
+    <string name="input_hint">Enter url here...</string>
+    <string name="add">Add</string>
+</resources>
