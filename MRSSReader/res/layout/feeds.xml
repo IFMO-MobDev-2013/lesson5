@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent" >
-    <ListView
+    <ru.mermakov.projects.MRSSReader.RefreshingListView
             android:id="@+id/listView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

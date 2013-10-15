@@ -1,9 +1,12 @@
 package ru.mermakov.projects.MRSSReader;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +23,7 @@ import android.widget.*;
 public class FeedActivity extends Activity {
     Application myApp;
     RSSFeed feed;
-    ListView lv;
+    RefreshingListView lv;
     CustomListAdapter adapter;
 
     @Override
@@ -35,13 +38,52 @@ public class FeedActivity extends Activity {
         feed = (RSSFeed) getIntent().getExtras().get("feed");
 
         // Initialize the variables:
-        lv = (ListView) findViewById(R.id.listView);
+        lv = (RefreshingListView) findViewById(R.id.listView);
+
         lv.setVerticalFadingEdgeEnabled(true);
 
         // Set an Adapter to the ListView
         adapter = new CustomListAdapter(this);
         lv.setAdapter(adapter);
 
+        lv.setOnRefreshListener(new RefreshingListView.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                AsyncLoadXMLFeed task=new AsyncLoadXMLFeed();
+                task.execute();
+                try {
+                task.get();
+                }
+                catch (Exception er){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(FeedActivity.this);
+                    builder.setMessage(
+                            "Unable to reach server, \nPlease check your connectivity.")
+                            .setTitle("MRSSReader")
+                            .setCancelable(false)
+                            .setPositiveButton("Exit",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int id) {
+                                            finish();
+                                        }
+                                    });
+
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+                lv.setVerticalFadingEdgeEnabled(true);
+                adapter=new CustomListAdapter(FeedActivity.this);
+                lv.setAdapter(adapter);
+
+                lv.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        lv.onRefreshComplete();
+                    }
+                },2000);
+            }
+        });
         // Set on item click listener to the ListView
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -123,5 +165,20 @@ public class FeedActivity extends Activity {
             return listItem;
         }
 
+    }
+
+    private class AsyncLoadXMLFeed extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            DOMParser myParser = new DOMParser();
+            feed = myParser.parseXml("http://www.mobilenations.com/rss/mb.xml");
+            String line;
+            return null;
+
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+        }
     }
 }

@@ -46,10 +46,7 @@ public class MyActivity extends Activity {
             alert.show();
 
         } else {
-            AsyncLoadXMLFeed t=new AsyncLoadXMLFeed();
-            t.execute();
-
-
+            new AsyncLoadXMLFeed().execute();
         }
     }
 
@@ -73,6 +70,5 @@ public class MyActivity extends Activity {
             startActivity(intent);
             finish();
         }
-
     }
 }
