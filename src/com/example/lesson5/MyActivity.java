@@ -36,11 +36,16 @@ public class MyActivity extends Activity {
     private Context context;
     public static Document doc;
     private ArrayList<RSSEntry> itemList;
+    //private ArrayAdapter<RSSEntry> arrayAdapter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         context = this;
+        //itemList = new ArrayList<>();
+        //ArrayAdapter<RSSEntry> arrayAdapter = new ArrayAdapter<>(context, R.layout.itemlayout, itemList);
         listView = (ListView)findViewById(R.id.listView);
         downloadButton = (Button)findViewById(R.id.button);
         inputUri = (EditText)findViewById(R.id.textField);
@@ -74,7 +79,8 @@ public class MyActivity extends Activity {
 
         @Override
         protected void onPostExecute(String result) {
-            setContentView(R.layout.main);
+            super.onPostExecute(result);
+            //setContentView(R.layout.main);
             // Displays the HTML string in the UI via a WebView
 
             if (xmlError.equals(result) || connectionError.equals(result)) {
@@ -167,7 +173,7 @@ public class MyActivity extends Activity {
         }
         ArrayAdapter<RSSEntry> arrayAdapter = new ArrayAdapter<>(context, R.layout.itemlayout, itemList);
         listView.setAdapter(arrayAdapter);
-        arrayAdapter.addAll(itemList);
+        //arrayAdapter.addAll(itemList);
     }
 
     private String loadXml (String url) throws IOException {
