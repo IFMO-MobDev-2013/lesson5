@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * Date: 13.10.13
@@ -22,9 +22,9 @@ import java.util.ArrayList;
 public class StackOverflowRSSReader {
 
     private static final String URL = "http://stackoverflow.com/feeds/tag/android";
+    private static final String SERVER_TIMEZONE = "GMT+00:00";
     private static final String ENCODING_CHARSET = "UTF-8";
 
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     private static final String FEED_TAG = "feed";
     private static final String ENTRY_TAG = "entry";
     private static final String LINK_TAG = "link";
@@ -35,10 +35,13 @@ public class StackOverflowRSSReader {
     private static final String RANK_TAG = "re:rank";
 
     private final XmlPullParser parser;
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     public StackOverflowRSSReader() throws XmlPullParserException {
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
         parser = factory.newPullParser();//About this exception at least javadocs says some information(but it is still very strange)
+
+        dateFormat.setTimeZone(TimeZone.getTimeZone(SERVER_TIMEZONE));
     }
 
     public Feed readFeed() throws IOException, XmlPullParserException, ParseException {
@@ -48,25 +51,29 @@ public class StackOverflowRSSReader {
 
         Preconditions.checkState(parser.getEventType() == XmlPullParser.START_DOCUMENT);
         Preconditions.checkState(parser.next() == XmlPullParser.START_TAG && FEED_TAG.equals(parser.getName()));
-        Feed feed = readFeed(parser);
+        Feed feed = parseFeed(parser);
         Preconditions.checkState(parser.next() == XmlPullParser.END_DOCUMENT);
         return feed;
     }
 
-    private Feed readFeed(XmlPullParser parser) throws XmlPullParserException, IOException, ParseException {
+    private Feed parseFeed(XmlPullParser parser) throws XmlPullParserException, IOException, ParseException {
         Preconditions.checkState(parser.getEventType() == XmlPullParser.START_TAG && FEED_TAG.equals(parser.getName()));
 
         Feed feed = new Feed();
         int eventType = parser.next();
         int level = 0;
+        ArrayList<String> tagsStack = new ArrayList<String>();
         while (!(eventType == XmlPullParser.END_TAG && level == 0)) {
             if (eventType == XmlPullParser.START_TAG) {
+                addTagToStack(parser.getName(), level, tagsStack);
                 level++;
             }
             if (eventType == XmlPullParser.START_TAG && level == 1 && ENTRY_TAG.equals(parser.getName())) {
-                FeedEntry entry = readEntry(parser);
+                FeedEntry entry = parseEntry(parser);
                 feed.addEntry(entry);
                 eventType = parser.getEventType();
+            } else if (eventType == XmlPullParser.TEXT && level == 1 && UPDATED_TAG.equals(tagsStack.get(level - 1))) {
+                feed.setUpdatedDate(parseDate(parser.getText()));
             }
             if (eventType == XmlPullParser.END_TAG) {
                 level--;
@@ -77,7 +84,7 @@ public class StackOverflowRSSReader {
         return feed;
     }
 
-    private FeedEntry readEntry(XmlPullParser parser) throws XmlPullParserException, IOException, ParseException {
+    private FeedEntry parseEntry(XmlPullParser parser) throws XmlPullParserException, IOException, ParseException {
         Preconditions.checkState(parser.getEventType() == XmlPullParser.START_TAG && ENTRY_TAG.equals(parser.getName()));
 
         FeedEntry entry = new FeedEntry();
@@ -86,12 +93,7 @@ public class StackOverflowRSSReader {
         ArrayList<String> tagsStack = new ArrayList<String>();
         while (!(eventType == XmlPullParser.END_TAG && level == 0)) {
             if (eventType == XmlPullParser.START_TAG) {
-                if (tagsStack.size() > level) {
-                    tagsStack.set(level, parser.getName());
-                } else {
-                    Preconditions.checkState(tagsStack.size() == level);
-                    tagsStack.add(parser.getName());
-                }
+                addTagToStack(parser.getName(), level, tagsStack);
                 level++;
             }
             if (eventType == XmlPullParser.START_TAG && level == 1 && LINK_TAG.equals(parser.getName())) {
@@ -99,9 +101,9 @@ public class StackOverflowRSSReader {
             } else if (eventType == XmlPullParser.TEXT && level == 1 && TITLE_TAG.equals(tagsStack.get(level - 1))) {
                 entry.setTitle(parser.getText());
             } else if (eventType == XmlPullParser.TEXT && level == 1 && PUBLISHED_TAG.equals(tagsStack.get(level - 1))) {
-                entry.setPublishedDate(dateFormat.parse(parser.getText()));
+                entry.setPublishedDate(parseDate(parser.getText()));
             } else if (eventType == XmlPullParser.TEXT && level == 1 && UPDATED_TAG.equals(tagsStack.get(level - 1))) {
-                entry.setUpdatedDate(dateFormat.parse(parser.getText()));
+                entry.setUpdatedDate(parseDate(parser.getText()));
             } else if (eventType == XmlPullParser.TEXT && level == 1 && RANK_TAG.equals(tagsStack.get(level - 1))) {
                 entry.setRank(Integer.parseInt(parser.getText()));
             }
@@ -113,6 +115,19 @@ public class StackOverflowRSSReader {
         }
         Preconditions.checkState(parser.getEventType() == XmlPullParser.END_TAG && ENTRY_TAG.equals(parser.getName()));
         return entry;
+    }
+
+    private static void addTagToStack(String tagName, int index, ArrayList<String> tagsStack) {
+        if (tagsStack.size() > index) {
+            tagsStack.set(index, tagName);
+        } else {
+            Preconditions.checkState(tagsStack.size() == index);
+            tagsStack.add(tagName);
+        }
+    }
+
+    private Date parseDate(String dateString) throws ParseException {
+        return dateFormat.parse(dateString);
     }
 
 }

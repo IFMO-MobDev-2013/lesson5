@@ -15,10 +15,14 @@ public class StackOverflowRSSReaderTest {
     public void testReadFeed() throws Exception {
         StackOverflowRSSReader reader = new StackOverflowRSSReader();
         Feed feed = reader.readFeed();
+
         Assert.assertNotNull(feed);
+        Assert.assertNotNull(feed.getUpdatedDate());
+
         List<FeedEntry> entries = feed.getEntries();
         Assert.assertNotNull(entries);
         Assert.assertTrue(entries.size() >= 1);
+
         for (FeedEntry entry : entries) {
             Assert.assertNotNull(entry);
             Assert.assertNotNull(entry.getLink());
