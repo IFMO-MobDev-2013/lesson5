@@ -101,16 +101,20 @@ public class MyActivity extends Activity {
                         }
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();
                 } catch (ParserConfigurationException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();
                 } catch (SAXException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();
                 }
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } finally {
-                httpCon.disconnect();
+                try {
+                    httpCon.disconnect();
+                } catch (NullPointerException e){
+                    e.printStackTrace();
+                }
             }
 
             return null;
@@ -124,7 +128,7 @@ public class MyActivity extends Activity {
 
     }
 
-    void refressRSSList() {
+    void refreshRSSList() {
         list.clear();
         myTask = new MyTask();
         myTask.execute();
@@ -169,7 +173,7 @@ public class MyActivity extends Activity {
             public void onClick(View view) {
                 try {
                     url = new URL(editText.getText().toString());
-                    refressRSSList();
+                    refreshRSSList();
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Error", 2000);
@@ -177,7 +181,7 @@ public class MyActivity extends Activity {
             }
         });
 
-        refressRSSList();
+        refreshRSSList();
 
 
     }

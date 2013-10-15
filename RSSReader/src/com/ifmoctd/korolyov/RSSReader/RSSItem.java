@@ -35,7 +35,7 @@ public class RSSItem {
 
     @Override
     public String toString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM - hh:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM - HH:mm:ss z");
         return getTitle() + "  ( " + simpleDateFormat.format(getDate()) + " )";
     }
 
