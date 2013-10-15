@@ -8,6 +8,7 @@ public class RSSItem implements Serializable {
     private String description = null;
     private String date = null;
     private String image = null;
+    private String link=null;
 
     void setTitle(String title) {
         this.title = title;
@@ -25,6 +26,10 @@ public class RSSItem implements Serializable {
         this.image = image;
     }
 
+    void setLink(String link) {
+        this.link=link;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -40,4 +45,10 @@ public class RSSItem implements Serializable {
     public String getImage() {
         return image;
     }
+
+    public String getLink() {
+        return link;
+    }
+
+
 }

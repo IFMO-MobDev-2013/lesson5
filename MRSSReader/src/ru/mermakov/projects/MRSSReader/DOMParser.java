@@ -36,7 +36,11 @@ public class DOMParser {
 
             // Get all <item> tags.
             NodeList nl = doc.getElementsByTagName("item");
+            NodeList n2 = doc.getElementsByTagName("entry");
             int length = nl.getLength();
+            int length2 = n2.getLength();
+
+
 
             for (int i = 0; i < length; i++) {
                 Node currentNode = nl.item(i);
@@ -79,11 +83,14 @@ public class DOMParser {
                             item.setDate(formatedDate);
                         }
 
+                        else if("link".equals(nodeName)) {
+                            item.setLink(theString);
+                        }
+
                     }
                 }
                 feed.addItem(item);
             }
-
         } catch (Exception e) {
         }
         return feed;
