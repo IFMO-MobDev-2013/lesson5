@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ViewSwitcher android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/viewSwitcher"
+              xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+                  android:layout_height="fill_parent">
+        <EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:text="http://stackoverflow.com/feeds/tag/android"
+                  android:id="@+id/editText"/>
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fetch"
+                android:id="@+id/button" android:layout_gravity="right|center_vertical"/>
+        <ListView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/listView"/>
+    </LinearLayout>
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent"
+                  android:layout_height="fill_parent">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="New Text"
+                android:id="@+id/textView"/>
+        <WebView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/webView"/>
+        <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="Go back"
+                android:id="@+id/button1"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:autoLink="web"
+                android:linksClickable="true"
+                android:text="Link"
+                android:id="@+id/textView1"/>
+    </LinearLayout>
+</ViewSwitcher>
