@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -29,6 +32,14 @@ public class MainActivity extends Activity {
             showFeed(feeds.get(position));
         }
     };
+    private final View.OnCreateContextMenuListener onCreateContextMenuListener = new View.OnCreateContextMenuListener() {
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+            menu.setHeaderTitle(feeds.get(info.position));
+            menu.add(Menu.NONE, Menu.NONE, Menu.NONE, R.string.remove);
+        }
+    };
 
     private List<String> feeds;
     private SharedPreferences preferences;
@@ -39,7 +50,8 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         preferences = getPreferences(MODE_PRIVATE);
-        feeds = Utils.asArrayList(GSON.<String[]>fromJson(preferences.getString(FEEDS_PREF, "[]"), String[].class));
+        String defaultUrls = GSON.toJson(getResources().getStringArray(R.array.default_urls));
+        feeds = Utils.asArrayList(GSON.<String[]>fromJson(preferences.getString(FEEDS_PREF, defaultUrls), String[].class));
         adapter = new ArrayAdapter<String>(this, R.layout.list_item, feeds);
 
         setContentView(R.layout.main);
@@ -47,6 +59,7 @@ public class MainActivity extends Activity {
         ListView listView = (ListView) findViewById(R.id.feed_list);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(onItemClickListener);
+        listView.setOnCreateContextMenuListener(onCreateContextMenuListener);
 
         input = (EditText) findViewById(R.id.input);
     }
@@ -57,11 +70,24 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    @SuppressWarnings("unused")
     public void addFeed(View view) {
         String url = input.getText().toString();
         input.setText("");
 
         feeds.add(0, url);
+        refreshList();
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        feeds.remove(info.position);
+        refreshList();
+        return true;
+    }
+
+    private void refreshList() {
         preferences.edit().putString(FEEDS_PREF, GSON.toJson(feeds.toArray())).commit();
         adapter.notifyDataSetChanged();
     }
