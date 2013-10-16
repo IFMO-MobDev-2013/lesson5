@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Xml;
-import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.*;
@@ -16,16 +15,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class MyActivity extends Activity {
-
-    void sendMsg(String c)
-    {
-        Toast toast = Toast.makeText(getApplicationContext(), c, Toast.LENGTH_SHORT);
-        toast.show();
-    }
 
     public static final String ns = null;
 
@@ -119,39 +111,58 @@ public class MyActivity extends Activity {
             }
         }
 
-        public void parse(InputStream in) throws XmlPullParserException, IOException {
+        public boolean parse(InputStream in) throws XmlPullParserException, IOException {
+            boolean res = true;
             try {
                 XmlPullParser parser = Xml.newPullParser();
                 parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
                 parser.setInput(in, null);
                 parser.nextTag();
                 readFeed(parser);
-            } finally {
+            }
+            catch (Exception e) {
+                res = false;
+            }
+            finally {
                 in.close();
+                return res;
             }
         }
 
     }
 
     private String loadXmlFromNetwork(String urlString) throws XmlPullParserException, IOException {
+        boolean res = true;
         InputStream stream = null;
         MyParser parser = new MyParser();
+        URL url;
+        HttpURLConnection conn;
         try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000);
-            conn.setConnectTimeout(15000);
+            url = new URL(urlString);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(7000);
+            conn.setConnectTimeout(10000);
             conn.setRequestMethod("GET");
             conn.setDoInput(true);
             conn.connect();
             stream = conn.getInputStream();
-            parser.parse(stream);
-        } finally {
+            if(stream == null)
+                res = false;
+            else
+                res = parser.parse(stream);
+        }
+        catch (Exception e) {
+            res = false;
+        }
+        finally {
             if (stream != null) {
                 stream.close();
             }
+            if(res)
+                return "OK";
+            else
+                return "ERROR";
         }
-        return "OK";
     }
 
     WebView myWebView;
@@ -165,28 +176,28 @@ public class MyActivity extends Activity {
     ArrayList<String> links;
     ArrayList<String> summaries;
     Button button1;
+    Toast toast;
 
     private class MyTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
             try {
-                String res = loadXmlFromNetwork(urls[0]);
-                if(!res.equals("OK"))
-                    sendMsg(res);
-                return res;
+                return (loadXmlFromNetwork(urls[0]));
             } catch (IOException e) {
-                sendMsg("connection_error");
                 return ("ERROR");
             } catch (XmlPullParserException e) {
-                sendMsg("xml_error");
                 return ("ERROR");
             }
         }
 
         @Override
         protected void onPostExecute(String result) {
-            if(result.equals("ERROR"))
+            if(result.equals("ERROR") || titles.isEmpty())
+            {
+                toast = Toast.makeText(getApplicationContext(), "ERROR. Maybe, Your Internet is bad?", Toast.LENGTH_LONG);
+                toast.show();
                 return;
+            }
             adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, titles);
             listView.setAdapter(adapter);
             listView.setOnItemClickListener(mMessageClickedHandler);
