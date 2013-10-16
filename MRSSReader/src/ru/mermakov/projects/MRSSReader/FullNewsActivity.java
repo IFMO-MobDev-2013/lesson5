@@ -16,7 +16,6 @@ public class FullNewsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fullnews);
-
         ScrollView sv = (ScrollView) findViewById(R.id.sv);
         sv.setVerticalFadingEdgeEnabled(true);
         feed = (RSSFeed) getIntent().getExtras().get("feed");

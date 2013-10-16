@@ -11,12 +11,11 @@ import java.util.Map;
 public class MemoryCache {
     private static final String TAG = "MemoryCache";
     private Map<String, Bitmap> cache = Collections.synchronizedMap(
-            new LinkedHashMap<String, Bitmap>(10, 1.5f, true));//Last argument true for LRU ordering
-    private long size = 0;//current allocated size
-    private long limit = 1000000;//max memory in bytes
+            new LinkedHashMap<String, Bitmap>(10, 1.5f, true));
+    private long size = 0;
+    private long limit = 1000000;
 
     public MemoryCache() {
-        //use 25% of available heap size
         setLimit(Runtime.getRuntime().maxMemory() / 4);
     }
 
@@ -29,7 +28,6 @@ public class MemoryCache {
         try {
             if (!cache.containsKey(id))
                 return null;
-            //NullPointerException sometimes happen here http://code.google.com/p/osmdroid/issues/detail?id=78
             return cache.get(id);
         } catch (NullPointerException ex) {
             ex.printStackTrace();
@@ -52,7 +50,7 @@ public class MemoryCache {
     private void checkSize() {
         Log.i(TAG, "cache size=" + size + " length=" + cache.size());
         if (size > limit) {
-            Iterator<Map.Entry<String, Bitmap>> iter = cache.entrySet().iterator();//least recently accessed item will be the first one iterated
+            Iterator<Map.Entry<String, Bitmap>> iter = cache.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, Bitmap> entry = iter.next();
                 size -= getSizeInBytes(entry.getValue());

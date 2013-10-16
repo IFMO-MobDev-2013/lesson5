@@ -16,6 +16,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ImageLoader {
+    private File cacheDir, cacheDirFeeds, cacheDirImage;
+
     MemoryCache memoryCache = new MemoryCache();
     FileCache fileCache;
     private Map<ImageView, String> imageViews = Collections
@@ -23,6 +25,15 @@ public class ImageLoader {
     ExecutorService executorService;
 
     public ImageLoader(Context context) {
+        if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+            cacheDir = new File(android.os.Environment.getExternalStorageDirectory(), "MRSSReader");
+            cacheDirFeeds = new File(cacheDir, "Feeds");
+            cacheDirImage = new File(cacheDir, "Images");
+        } else {
+            cacheDir = context.getCacheDir();
+            cacheDirFeeds = new File(cacheDir, "Feeds");
+            cacheDirImage = new File(cacheDir, "Images");
+        }
         fileCache = new FileCache(context);
         executorService = Executors.newFixedThreadPool(5);
     }
@@ -46,14 +57,12 @@ public class ImageLoader {
     }
 
     private Bitmap getBitmap(String url) {
-        File f = fileCache.getFile(url);
+        File f = fileCache.getFile(cacheDirImage, url);
 
-        // from SD cache
         Bitmap b = decodeFile(f);
         if (b != null)
             return b;
 
-        // from web
         try {
             Bitmap bitmap = null;
             URL imageUrl = new URL(url);
@@ -76,17 +85,14 @@ public class ImageLoader {
         }
     }
 
-    // decodes image and scales it to reduce memory consumption
     private Bitmap decodeFile(File f) {
         try {
-            // decode image size
             BitmapFactory.Options o = new BitmapFactory.Options();
             o.inJustDecodeBounds = true;
             FileInputStream stream1 = new FileInputStream(f);
             BitmapFactory.decodeStream(stream1, null, o);
             stream1.close();
 
-            // Find the correct scale value. It should be the power of 2.
             final int REQUIRED_SIZE = 70;
             int width_tmp = o.outWidth, height_tmp = o.outHeight;
             int scale = 1;
@@ -99,7 +105,6 @@ public class ImageLoader {
                 scale *= 2;
             }
 
-            // decode with inSampleSize
             BitmapFactory.Options o2 = new BitmapFactory.Options();
             o2.inSampleSize = scale;
             FileInputStream stream2 = new FileInputStream(f);
@@ -113,7 +118,6 @@ public class ImageLoader {
         return null;
     }
 
-    // Task for the queue
     private class PhotoToLoad {
         public String url;
         public ImageView imageView;
@@ -156,7 +160,6 @@ public class ImageLoader {
         return false;
     }
 
-    // Used to display bitmap in the UI thread
     class BitmapDisplayer implements Runnable {
         Bitmap bitmap;
         PhotoToLoad photoToLoad;
@@ -178,6 +181,6 @@ public class ImageLoader {
 
     public void clearCache() {
         memoryCache.clear();
-        fileCache.clear();
+        fileCache.clear(cacheDirImage);
     }
 }

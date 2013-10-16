@@ -112,6 +112,7 @@ public class FeedActivity extends Activity {
     class CustomListAdapter extends BaseAdapter {
         private LayoutInflater layoutInflater;
         public ImageLoader imageLoader;
+
         public CustomListAdapter(FeedActivity activity) {
             layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             imageLoader = new ImageLoader(activity.getApplicationContext());
@@ -144,7 +145,8 @@ public class FeedActivity extends Activity {
             TextView tvDate = (TextView) listItem.findViewById(R.id.date);
             imageLoader.DisplayImage(feed.getItem(pos).getImage(), iv);
             tvTitle.setText(feed.getItem(pos).getTitle());
-            tvDate.setText(feed.getItem(pos).getDate());            return listItem;
+            tvDate.setText(feed.getItem(pos).getDate());
+            return listItem;
         }
 
     }
@@ -152,8 +154,10 @@ public class FeedActivity extends Activity {
     private class AsyncLoadXMLFeed extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
-            DOMParser myParser = new DOMParser();
-            feed = myParser.parseXml("http://news.yandex.ru/computers.rss");
+            DOMParser myParser = new DOMParser(FeedActivity.this);
+            FileLoader fl=new FileLoader(FeedActivity.this);
+            //fl.saveRss(getString(R.string.link));
+            feed = myParser.parseXml(getString(R.string.link));
             String line;
             return null;
         }
