@@ -28,7 +28,7 @@ public class Program extends Activity
     public void onRssLoaded(XmlDocument target)
     {
         Console.print("Rss loaded");
-        Vector<Entry> e = new Vector<Entry>();
+        //Vector<Entry> e = new Vector<Entry>();
         if (target.findByName("feed").size() > 0)
         {
             Vector<XmlNode> nodes = target.findByName("entry");
@@ -37,6 +37,7 @@ public class Program extends Activity
                 Entry entry = parseEntry(nodes.get(i));
                 Console.print("Entry ("+entry.link+"): "+entry.title);
                 adapter.entries.add(entry);
+                //e.add(entry);
             }
         }
         else if (target.findByName("channel").size() > 0)
@@ -48,9 +49,16 @@ public class Program extends Activity
                 Entry entry = parseItem(nodes.get(i));
                 Console.print("Item ("+entry.link+"): "+entry.title);
                 adapter.entries.add(entry);
+                //e.add(entry);
             }
         }
-        ((ProgressBar)findViewById(R.id.progressBar)).setVisibility(ProgressBar.INVISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((ProgressBar)findViewById(R.id.progressBar)).setVisibility(ProgressBar.INVISIBLE);
+                adapter.notifyDataSetChanged();
+            }
+        });
     }
 
     public void onClick(View v)
@@ -58,7 +66,12 @@ public class Program extends Activity
         adapter.entries.clear();
         TextView tv = (TextView)findViewById(R.id.linkText);
         String link = String.valueOf(tv.getText());
-        ((ProgressBar)findViewById(R.id.progressBar)).setVisibility(ProgressBar.VISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((ProgressBar)findViewById(R.id.progressBar)).setVisibility(ProgressBar.VISIBLE);
+            }
+        });
         new XmlLoader(link, this).start();
     }
 
