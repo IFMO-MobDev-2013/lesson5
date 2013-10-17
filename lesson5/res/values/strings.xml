@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">lesson5</string>
+    <string-array name="list_items">
+        <item>item0</item>
+        <item>item1</item>
+        <item>item2</item>
+        <item>item3</item>
+        <item>item4</item>
+        <item>item5</item>
+        <item>item6</item>
+        <item>item7</item>
+        <item>item8</item>
+        <item>item9</item>
+        <item>itemA</item>
+        <item>itemB</item>
+        <item>itemC</item>
+        <item>itemD</item>
+        <item>itemE</item>
+        <item>itemF</item>
+    </string-array>
+</resources>

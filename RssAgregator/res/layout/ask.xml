@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent" android:gravity="center">
+
+    <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="http://stackoverflow.com/feeds/tag/android"
+            android:id="@+id/radioButton3" android:layout_gravity="left|center_vertical" android:onClick="onClick"
+            android:checked="true"/>
+    <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="http://lenta.ru/rss"
+            android:id="@+id/radioButton2" android:layout_gravity="left|center_vertical" android:onClick="onClick"
+            android:checked="true"/>
+    <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="http://habrahabr.ru/rss/hubs/"
+            android:id="@+id/radioButton1" android:layout_gravity="left|center_vertical" android:onClick="onClick"
+            android:checked="true"/>
+    <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="http://bash.im/rss/"
+            android:id="@+id/radioButton0" android:layout_gravity="left|center_vertical" android:onClick="onClick"
+            android:checked="true"/>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_gravity="left|center_vertical">
+        <EditText
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/editText" android:layout_weight="80" android:hint="where from?"
+                android:text="http://bash.im/rss/" android:singleLine="true"/>
+        <Button
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:id="@+id/button" android:layout_weight="20" android:text="OK"/>
+    </LinearLayout>
+</LinearLayout>
