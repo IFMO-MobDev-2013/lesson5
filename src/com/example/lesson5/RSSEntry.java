@@ -11,11 +11,12 @@ public class RSSEntry {
     public String title;
     public String link;
     public String description;
-    public RSSEntry(String title, String description, String link) {
+    public String encoding;
+    public RSSEntry(String title, String description, String link, String encoding) {
         this.title = title;
         this.description = description;
         this.link = link;
-
+        this.encoding = encoding;
     }
     @Override
     public String toString() {
