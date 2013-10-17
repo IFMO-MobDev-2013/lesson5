@@ -16,6 +16,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Mikhail
@@ -32,12 +35,8 @@ public class FeedActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.feeds);
-
         myApp = getApplication();
-
-        // Get feed form the file
         feed = (RSSFeed) getIntent().getExtras().get("feed");
         if(feed.getItemCount()==0){
             AlertDialog.Builder builder = new AlertDialog.Builder(FeedActivity.this);
@@ -56,12 +55,10 @@ public class FeedActivity extends Activity {
             alert.show();
         }
 
-        // Initialize the variables:
         lv = (RefreshingListView) findViewById(R.id.listView);
 
         lv.setVerticalFadingEdgeEnabled(true);
 
-        // Set an Adapter to the ListView
         adapter = new CustomListAdapter(this);
         lv.setAdapter(adapter);
 
@@ -188,13 +185,14 @@ public class FeedActivity extends Activity {
         protected Void doInBackground(Void... params){
             DOMParser myParser = new DOMParser(FeedActivity.this);
             FileLoader fl=new FileLoader(FeedActivity.this);
-            try{
-                feed = myParser.parseXml(getString(R.string.link));
-            }
-            catch(RSSFeedXMLParseException er) {
+            String link = getString(R.string.link);
+            try {
+                URL url = new URL(link);
+                feed = myParser.parseXml(url);
+            } catch (MalformedURLException e) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(FeedActivity.this);
                 builder.setMessage(
-                        "Unsupported format")
+                        "Incorrect link")
                         .setTitle("MRSSReader")
                         .setPositiveButton("Exit",
                                 new DialogInterface.OnClickListener() {
@@ -206,6 +204,7 @@ public class FeedActivity extends Activity {
                                 });
                 AlertDialog alert = builder.create();
                 alert.show();
+
             }
             String line;
             return null;

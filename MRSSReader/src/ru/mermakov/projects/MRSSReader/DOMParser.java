@@ -8,11 +8,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class DOMParser {
@@ -22,15 +19,7 @@ public class DOMParser {
         cache=new FileCache(context);
     }
 
-    public RSSFeed parseXml(String xml) throws RSSFeedXMLParseException {
-        File file=cache.getRssFile(xml);
-        URL url = null;
-        try {
-            url = new URL(xml);
-        } catch (MalformedURLException e1) {
-            e1.printStackTrace();
-        }
-
+    public RSSFeed parseXml(URL url) {
         try {
             DocumentBuilderFactory dbf;
             dbf = DocumentBuilderFactory.newInstance();
@@ -38,9 +27,6 @@ public class DOMParser {
             Document doc = db.parse(new InputSource(url.openStream()));
             doc.getDocumentElement().normalize();
             NodeList nl = doc.getElementsByTagName("item");
-            if(nl.equals(0))
-                throw new RSSFeedXMLParseException();
-
             int length = nl.getLength();
 
             for (int i = 0; i < length; i++) {

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import java.net.URL;
 
 
 public class MyActivity extends Activity {
@@ -18,9 +19,7 @@ public class MyActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        cache=new FileCache(MyActivity.this);
-
-
+        cache = new FileCache(MyActivity.this);
         ConnectivityManager conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (conMgr.getActiveNetworkInfo() == null
                 || !conMgr.getActiveNetworkInfo().isConnected()
@@ -29,11 +28,17 @@ public class MyActivity extends Activity {
             builder.setMessage(
                     "Unable to reach server, \nPlease check your connectivity.")
                     .setTitle("MRSSReader")
-                    .setCancelable(false);
+                    .setCancelable(false)
+                    .setPositiveButton("Exit",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int id) {
+                                    finish();
+                                }
+                            });
             AlertDialog alert = builder.create();
             alert.show();
-
-
         } else {
             new AsyncLoadXMLFeed().execute();
         }
@@ -43,14 +48,15 @@ public class MyActivity extends Activity {
         @Override
         protected Void doInBackground(Void... params) {
             DOMParser myParser = new DOMParser(MyActivity.this);
-            FileLoader fl=new FileLoader(MyActivity.this);
-            try{
-                feed = myParser.parseXml(getString(R.string.link));
-            }
-            catch(RSSFeedXMLParseException er) {
+            String link = getString(R.string.link);
+
+            try {
+                URL url = new URL(link);
+                feed = myParser.parseXml(url);
+            } catch (Exception e) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MyActivity.this);
                 builder.setMessage(
-                        "Unsupported format")
+                        "Error")
                         .setTitle("MRSSReader")
                         .setPositiveButton("Exit",
                                 new DialogInterface.OnClickListener() {
@@ -62,6 +68,7 @@ public class MyActivity extends Activity {
                                 });
                 AlertDialog alert = builder.create();
                 alert.show();
+                feed=new RSSFeed();
             }
             String line;
             return null;
