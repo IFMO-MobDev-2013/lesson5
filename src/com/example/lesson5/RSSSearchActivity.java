@@ -20,7 +20,7 @@ import java.net.URLConnection;
 
 public class RSSSearchActivity extends Activity {
 
-    private final String rssURL = "http://news.google.com/?output=rss";
+    private final String rssURL = "http://www.vesti.ru/vesti.rss";
     private ListView listView;
     private MyAdapter myAdapter;
     private LinearLayout linearLayout;

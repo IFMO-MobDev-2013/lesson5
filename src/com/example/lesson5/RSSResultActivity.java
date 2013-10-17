@@ -20,6 +20,6 @@ public class RSSResultActivity extends Activity {
         WebView webView = (WebView) findViewById(R.id.resultWebView);
         Intent intent = getIntent();
         String html = intent.getStringExtra("html");
-        webView.loadData(html, "text/html", null);
+        webView.loadDataWithBaseURL(null, html ,"text/html", "UTF-8", null);
     }
 }
