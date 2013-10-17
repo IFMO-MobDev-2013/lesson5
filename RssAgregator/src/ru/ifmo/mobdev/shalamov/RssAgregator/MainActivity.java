@@ -6,19 +6,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 
 public class MainActivity extends Activity {
     /**
      * Called when the activity is first created.
      */
+
+    EditText editText = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ask);
 
-        final EditText editText = (EditText)findViewById(R.id.editText);
+        editText = (EditText) findViewById(R.id.editText);
 
-        Button button = (Button)findViewById(R.id.button);
+        Button button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -28,4 +32,24 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.radioButton0:
+                editText.setText("http://bash.im/rss/");
+//                ((RadioButton)v).setO
+
+            case R.id.radioButton1:
+                editText.setText("http://lenta.ru/rss");
+                break;
+            case R.id.radioButton2:
+                editText.setText("http://habrahabr.ru/rss/hubs/");
+                break;
+            case R.id.radioButton3:
+                editText.setText("http://stackoverflow.com/feeds/tag/android");
+                break;
+        }
+    }
+
 }

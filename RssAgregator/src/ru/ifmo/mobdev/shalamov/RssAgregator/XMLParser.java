@@ -1,6 +1,5 @@
 package ru.ifmo.mobdev.shalamov.RssAgregator;
 
-import android.widget.ArrayAdapter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -44,9 +43,7 @@ public class XMLParser {
             InputSource is = new InputSource();
             try {
                 is.setCharacterStream(new StringReader(xml));
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             doc = db.parse(is);
@@ -67,13 +64,13 @@ public class XMLParser {
         return this.getElementValue(n.item(0));
     }
 
-    private final String getElementValue( Node elem ) {
+    private final String getElementValue(Node elem) {
         Node child;
-        if( elem != null){
-            if (elem.hasChildNodes()){
-                for( child = elem.getFirstChild(); child != null; child = child.getNextSibling() ){
+        if (elem != null) {
+            if (elem.hasChildNodes()) {
+                for (child = elem.getFirstChild(); child != null; child = child.getNextSibling()) {
                     //if( child.getNodeType() == Node.TEXT_NODE  ){
-                        return child.getNodeValue();
+                    return child.getNodeValue();
                     //}
                 }
             }
@@ -81,33 +78,29 @@ public class XMLParser {
         return "no data in xml";
     }
 
-    public ArrayList<FeedItem> getFeed(String xml)
-    {
+    public ArrayList<FeedItem> getFeed(String xml) {
         XMLParser parser = new XMLParser();
 
         Document doc = parser.getDomElement(xml); // getting DOM element
         NodeList nl = null;
 
-        try{
+        try {
             NodeList feed = doc.getElementsByTagName("feed");
             //NodeList rss = doc.getElementsByTagName("rss");
 
-            if(feed.item(0) != null && feed.item(0).hasChildNodes())
-            {
+            if (feed.item(0) != null && feed.item(0).hasChildNodes()) {
                 KEY_ITEM = "entry";
                 KEY_LINK = "id";
                 KEY_DESC = "summary";
                 KEY_DATE = "published";
             }
-        }
-        catch(Exception e) {}         // i can't believe!
+        } catch (Exception e) {
+        }         // i can't believe!
 
         try {
             nl = doc.getElementsByTagName(KEY_ITEM);  // getting a list of nodes
 
-        }
-        catch (Exception exc)
-        {
+        } catch (Exception exc) {
             return null;
         }
 
@@ -115,14 +108,18 @@ public class XMLParser {
 
 
         for (int i = 0; i < nl.getLength(); i++) {
-            String link = parser.getValue((Element)nl.item(i), KEY_LINK);
-            String description = parser.getValue((Element)nl.item(i), KEY_DESC);
-            String title = parser.getValue((Element)nl.item(i), KEY_TITLE);
+            String link = parser.getValue((Element) nl.item(i), KEY_LINK);
+            String description = parser.getValue((Element) nl.item(i), KEY_DESC);
+            String title = parser.getValue((Element) nl.item(i), KEY_TITLE);
             String pubDate = parser.getValue((Element) nl.item(i), KEY_DATE);
 
+            description = description.trim();
 
-            if(description == null)
-                description = "fuck DOM XMLParser";
+
+
+            if (description == null)
+                //description = "fuck DOM XMLParser";
+                description = "none";
 
             if (description.indexOf("&amp;") != -1) {
                 description = description.replaceAll("&amp;", "&");
@@ -134,8 +131,15 @@ public class XMLParser {
                 description = description.replaceAll("<br>", "\n");
             }
             if (description.indexOf("&gt;") != -1) {
-                description = description.replaceAll("&gt;", "^");
+                description = description.replaceAll("&gt;", ">");
             }
+            if (description.indexOf("&lt;") != -1) {
+                description = description.replaceAll("&lt;", "<");
+            }
+            if (description.indexOf("&apos;") != -1) {
+                description = description.replaceAll("&apos;", "`");
+            }
+
 
             feed.add(new FeedItem(link, title, pubDate, description, 0));
         }

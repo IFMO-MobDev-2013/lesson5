@@ -1,32 +1,22 @@
 package ru.ifmo.mobdev.shalamov.RssAgregator;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.*;
-
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-
-
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.w3c.dom.*;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.ArrayList;
 
 public class MyActivity extends Activity {
     /**
@@ -34,48 +24,35 @@ public class MyActivity extends Activity {
      */
 
     ArrayList<FeedItem> feed;
-//    final String DEFAULT_QUERY = "http://bash.im/rss/";
+    //  final String DEFAULT_QUERY = "http://bash.im/rss/";
 //   final String DEFAULT_QUERY = "http://habrahabr.ru/rss/hubs/";
-    final String DEFAULT_QUERY = "http://lenta.ru/rss" ;
-//    final String DEFAULT_QUERY = "http://stackoverflow.com/feeds/tag/android";
+//    final String DEFAULT_QUERY = "http://lenta.ru/rss" ;
+    final String DEFAULT_QUERY = "http://stackoverflow.com/feeds/tag/android";
     String query;
     String answer;
     ListView lv;
     FeedAdapter adapter = null;
+    ProgressDialog progressDialog = null;
+
 
     class LoadRssTask extends AsyncTask<String, Void, Void> {
 
+        boolean loadFailed = false;
+        boolean parseFailed = false;
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(MyActivity.this);
+            progressDialog.setTitle("Loading");
+            progressDialog.setMessage("Please Wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+
         @Override
         protected Void doInBackground(String... params) {
-            // download data from query
 
-//            URL url = null;
-//            StringBuilder builder = null;
-//            InputStream is = null;
-//            BufferedReader reader = null;
-//            HttpURLConnection connection = null;
-//            try {
-//                url = new URL(query);
-//                connection = (HttpURLConnection) url.openConnection();
-//                connection.setConnectTimeout(15000);
-//                String s = null;
-//                builder = new StringBuilder();
-//                is = connection.getInputStream();     /// here
-//                reader = new BufferedReader(new InputStreamReader(is, "windows-1251"));
-//                while ((s = reader.readLine()) != null) {
-//                    builder.append(s);
-//                }
-//            } catch (Exception exc) {
-//                Log.d("fuck!", exc.getMessage());
-//            } finally {
-//                if (connection != null)
-//                    connection.disconnect();
-//            }
-//
-//            if (builder != null)
-//                answer = builder.toString();
-//            else
-//                answer =  null;
 
             try {
                 DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -84,20 +61,18 @@ public class MyActivity extends Activity {
                 HttpEntity httpEntity = httpResponse.getEntity();
                 answer = EntityUtils.toString(httpEntity);
             } catch (Exception exc) {
-                Log.d("fuck!", exc.getMessage());
+                loadFailed = true;
+                return null;
             }
 
             XMLParser parser = new XMLParser();
             try {
                 feed = parser.getFeed(answer);
-                if(feed.equals(feed)){}      // to catch nullpointer
                 adapter = new FeedAdapter(MyActivity.this, feed);
 
-            }
-            catch (Exception exc)
-            {
-                Log.d("fuck! fuck!! fuck!!!!", exc.getMessage());
-               // feed = null;
+            } catch (Exception exc) {
+                parseFailed = true;
+                // feed = null;
                 //adapter = null;
             }
 
@@ -105,13 +80,32 @@ public class MyActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(Void result)
-        {
+        protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            lv.setAdapter(adapter);
+            if (loadFailed) {
+                Toast.makeText(MyActivity.this, "downloading failed", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+                onBackPressed();
+                return;
+            }
+            if (parseFailed) {
+                Toast.makeText(MyActivity.this, "xml parsing failed! \n Relax, it's usual. ", Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+                onBackPressed();
+                return;
+            }
+
+            try {
+                lv.setAdapter(adapter);
+                progressDialog.dismiss();
+            }
+            catch (Exception exc)
+            {
+                progressDialog.dismiss();
+                Toast.makeText(MyActivity.this, "something goes wrong. check your input", Toast.LENGTH_SHORT).show();
+                onBackPressed();
+            }
         }
-
-
     }
 
     @Override
@@ -127,41 +121,23 @@ public class MyActivity extends Activity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //Toast.makeText(getApplicationContext(), ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MyActivity.this, ShowActivity.class);
-                FeedItem fi =  adapter.feed.get(i);
+                FeedItem fi = adapter.feed.get(i);
                 intent.putExtra("link", fi.link);
                 startActivity(intent);
             }
         });
 
         Intent intent = getIntent();
-        try
-        {
+        try {
             query = intent.getStringExtra("url");
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             query = DEFAULT_QUERY;
         }
+        if (query == null || "".equals(query))
+            query = DEFAULT_QUERY;
 
         new LoadRssTask().execute(query);
     }
-
-
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);    //To change body of overridden methods use File | Settings | File Templates.
-//        try
-//        {
-//            query = data.getStringExtra("from");
-//        }
-//        catch(Exception exc)
-//        {
-//            query = DEFAULT_QUERY;
-//        }
-//        if(query == null || query == "")
-//            query = DEFAULT_QUERY;
-//    }
 }
 
 
