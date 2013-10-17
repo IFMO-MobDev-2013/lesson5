@@ -1,6 +1,7 @@
 package ru.mermakov.projects.MRSSReader;
 
 import android.content.Context;
+import android.util.Log;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.w3c.dom.Document;
@@ -21,7 +22,7 @@ public class DOMParser {
         cache=new FileCache(context);
     }
 
-    public RSSFeed parseXml(String xml) {
+    public RSSFeed parseXml(String xml) throws RSSFeedXMLParseException {
         File file=cache.getRssFile(xml);
         URL url = null;
         try {
@@ -34,13 +35,12 @@ public class DOMParser {
             DocumentBuilderFactory dbf;
             dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder db = dbf.newDocumentBuilder();
-
-            //Document doc=db.parse(file);
             Document doc = db.parse(new InputSource(url.openStream()));
             doc.getDocumentElement().normalize();
-
             NodeList nl = doc.getElementsByTagName("item");
-            NodeList n2 = doc.getElementsByTagName("entry");
+            if(nl.equals(0))
+                throw new RSSFeedXMLParseException();
+
             int length = nl.getLength();
 
             for (int i = 0; i < length; i++) {
@@ -51,13 +51,10 @@ public class DOMParser {
                 int clength = nchild.getLength();
 
                 for (int j = 1; j < clength; j = j + 2) {
-
                     Node thisNode = nchild.item(j);
                     String theString = null;
                     String nodeName = thisNode.getNodeName();
-
                     theString = nchild.item(j).getFirstChild().getNodeValue();
-
                     if (theString != null) {
                         if ("title".equals(nodeName)) {
                             item.setTitle(theString);
@@ -81,6 +78,7 @@ public class DOMParser {
                 feed.addItem(item);
             }
         } catch (Exception e) {
+            Log.i("error", e.getMessage());
         }
         return feed;
     }

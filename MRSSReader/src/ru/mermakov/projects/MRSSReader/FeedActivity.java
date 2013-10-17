@@ -39,6 +39,22 @@ public class FeedActivity extends Activity {
 
         // Get feed form the file
         feed = (RSSFeed) getIntent().getExtras().get("feed");
+        if(feed.getItemCount()==0){
+            AlertDialog.Builder builder = new AlertDialog.Builder(FeedActivity.this);
+            builder.setMessage(
+                    "Unsupported format")
+                    .setTitle("MRSSReader")
+                    .setPositiveButton("Exit",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int id) {
+                                    finish();
+                                }
+                            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }
 
         // Initialize the variables:
         lv = (RefreshingListView) findViewById(R.id.listView);
@@ -71,6 +87,22 @@ public class FeedActivity extends Activity {
                                         }
                                     });
 
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+                if(feed.getItemCount()==0){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(FeedActivity.this);
+                    builder.setMessage(
+                            "Unsupported format")
+                            .setTitle("MRSSReader")
+                            .setPositiveButton("Exit",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int id) {
+                                            finish();
+                                        }
+                                    });
                     AlertDialog alert = builder.create();
                     alert.show();
                 }
@@ -153,11 +185,28 @@ public class FeedActivity extends Activity {
 
     private class AsyncLoadXMLFeed extends AsyncTask<Void, Void, Void> {
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(Void... params){
             DOMParser myParser = new DOMParser(FeedActivity.this);
             FileLoader fl=new FileLoader(FeedActivity.this);
-            //fl.saveRss(getString(R.string.link));
-            feed = myParser.parseXml(getString(R.string.link));
+            try{
+                feed = myParser.parseXml(getString(R.string.link));
+            }
+            catch(RSSFeedXMLParseException er) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(FeedActivity.this);
+                builder.setMessage(
+                        "Unsupported format")
+                        .setTitle("MRSSReader")
+                        .setPositiveButton("Exit",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog,
+                                                        int id) {
+                                        finish();
+                                    }
+                                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
             String line;
             return null;
         }

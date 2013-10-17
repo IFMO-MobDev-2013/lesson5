@@ -3,6 +3,7 @@ package ru.mermakov.projects.MRSSReader;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
@@ -43,8 +44,25 @@ public class MyActivity extends Activity {
         protected Void doInBackground(Void... params) {
             DOMParser myParser = new DOMParser(MyActivity.this);
             FileLoader fl=new FileLoader(MyActivity.this);
-            //fl.saveRss(getString(R.string.link));
-            feed = myParser.parseXml(getString(R.string.link));
+            try{
+                feed = myParser.parseXml(getString(R.string.link));
+            }
+            catch(RSSFeedXMLParseException er) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MyActivity.this);
+                builder.setMessage(
+                        "Unsupported format")
+                        .setTitle("MRSSReader")
+                        .setPositiveButton("Exit",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog,
+                                                        int id) {
+                                        finish();
+                                    }
+                                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
             String line;
             return null;
         }
