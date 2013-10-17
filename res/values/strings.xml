@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">lesson5</string>
+    <string name="button_text">Download</string>
+    <string name="connection_error">Connection error</string>
+    <string name="xml_error">XML parsing error</string>
+</resources>
