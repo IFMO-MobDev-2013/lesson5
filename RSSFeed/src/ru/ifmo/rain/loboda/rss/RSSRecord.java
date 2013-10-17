@@ -8,42 +8,43 @@ public class RSSRecord {
 
     Fields toRecord;
 
-    RSSRecord(){}
+    RSSRecord() {
+    }
 
-    public String getAuthor(){
+    public String getAuthor() {
         return author;
     }
 
-    public String getAnnotation(){
+    public String getAnnotation() {
         return annotation;
     }
 
-    public String getDate(){
+    public String getDate() {
         return date;
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return description;
     }
 
-    public void setAuthor(){
+    public void setAuthor() {
         toRecord = Fields.AUTHOR;
     }
 
-    public void setDescription(){
+    public void setDescription() {
         toRecord = Fields.DESCRIPTION;
     }
 
-    public void setAnnotation(){
+    public void setAnnotation() {
         toRecord = Fields.ANNOTATION;
     }
 
-    public void setDate(){
+    public void setDate() {
         toRecord = Fields.DATE;
     }
 
-    public void set(String value){
-        switch (toRecord){
+    public void set(String value) {
+        switch (toRecord) {
             case DATE:
                 date = value;
                 break;
@@ -58,7 +59,8 @@ public class RSSRecord {
                 break;
         }
     }
-    private enum Fields{
+
+    private enum Fields {
         DATE, ANNOTATION, AUTHOR, DESCRIPTION;
     }
 }

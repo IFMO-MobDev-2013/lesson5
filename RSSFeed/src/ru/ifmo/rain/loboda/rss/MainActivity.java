@@ -26,13 +26,13 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
         Button button = (Button) findViewById(R.id.button);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, someChannels);
-        ListView listView = (ListView)findViewById(R.id.channels);
+        ListView listView = (ListView) findViewById(R.id.channels);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String obj = (String)adapterView.getAdapter().getItem(i);
-                ((EditText)findViewById(R.id.editText)).setText(obj, TextView.BufferType.EDITABLE);
+                String obj = (String) adapterView.getAdapter().getItem(i);
+                ((EditText) findViewById(R.id.editText)).setText(obj, TextView.BufferType.EDITABLE);
             }
         });
         button.setOnClickListener(new View.OnClickListener() {
