@@ -14,6 +14,7 @@ public class MyActivity extends Activity {
     ListView rssListView = null;
     public static ArrayList<RSSItem> rssItems = new ArrayList<RSSItem>();
     public static ArrayAdapter<RSSItem> aa = null;
+    public static MyArrayAdapter myArrayAdapter;
     public static ProgressBar progressBar;
 
     @Override
@@ -25,16 +26,18 @@ public class MyActivity extends Activity {
         final EditText rssURLTV = (EditText) findViewById(R.id.rssURL);
         Button fetchRss = (Button) findViewById(R.id.fetchRss);
         rssListView = (ListView) findViewById(R.id.rssListView);
-        aa = new ArrayAdapter<RSSItem>(this, R.layout.list_item, rssItems);
-        rssListView.setAdapter(aa);
+        myArrayAdapter = new MyArrayAdapter(this,rssItems);
+        rssListView.setAdapter(myArrayAdapter);
+        //aa = new ArrayAdapter<RSSItem>(this, R.layout.list_item, R.id.label, rssItems);
+        //rssListView.setAdapter(aa);
         feedUrl = rssURLTV.getText().toString();
-        //refreshRssList();
 
         fetchRss.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 feedUrl = rssURLTV.getText().toString();
-                aa.notifyDataSetChanged();
+                //aa.notifyDataSetChanged();
+                myArrayAdapter.notifyDataSetChanged();
                 refreshRssList();
             }
         });
@@ -44,10 +47,10 @@ public class MyActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> av, View view, int index,long arg3) {
                 selectedRssItem = rssItems.get(index);
-
                 Intent intent = new Intent();
                 intent.setClass(getApplicationContext(),RssItemDisplayer.class);
                 startActivity(intent);
+
             }
         });
     }

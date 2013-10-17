@@ -14,12 +14,22 @@ public class RSSItem {
     private String description;
     private String pubDate;
     private String link;
+    private boolean open;
 
     public RSSItem(String title, String description, String pubDate, String link) {
         this.title = title;
         this.description = description;
         this.pubDate = pubDate;
         this.link = link;
+        this.open = false;
+    }
+
+    public void setOpen(){
+        this.open = true;
+    }
+
+    public boolean getOpen(){
+        return this.open;
     }
 
     public String getTitle()
@@ -187,7 +197,8 @@ public class RSSItem {
 
         protected void onPostExecute(ArrayList<RSSItem> result) {
             MyActivity.rssItems.addAll(result);
-            MyActivity.aa.notifyDataSetChanged();
+            //MyActivity.aa.notifyDataSetChanged();
+            MyActivity.myArrayAdapter.notifyDataSetChanged();
         }
     }
 }

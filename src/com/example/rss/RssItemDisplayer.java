@@ -12,6 +12,8 @@ public class RssItemDisplayer extends Activity {
         setContentView(R.layout.rss_item_displayer);
 
         RSSItem selectedRssItem = MyActivity.selectedRssItem;
+        MyActivity.selectedRssItem.setOpen();
+        MyActivity.myArrayAdapter.notifyDataSetChanged();
         TextView titleTv = (TextView)findViewById(R.id.titleTextView);
         WebView contentTv = (WebView)findViewById(R.id.contentTextView);
 
