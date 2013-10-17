@@ -192,15 +192,16 @@ public class MyActivity extends Activity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             listView.setAdapter(arrayAdapter);
+            arrayAdapter.notifyDataSetChanged();
         }
 
     }
 
     void refreshRSSList() {
         list.clear();
+        arrayAdapter.notifyDataSetChanged();
         myTask = new MyTask();
         myTask.execute();
-
     }
 
 
@@ -215,7 +216,7 @@ public class MyActivity extends Activity {
         final EditText editText = (EditText) findViewById(R.id.editText);
 
         try {
-            url = new URL("http://stackoverflow.com/feeds/tag/android");
+            url = new URL("http://habrahabr.ru/rss");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
