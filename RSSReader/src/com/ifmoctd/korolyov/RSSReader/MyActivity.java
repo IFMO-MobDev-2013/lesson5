@@ -33,6 +33,94 @@ public class MyActivity extends Activity {
 
     MyTask myTask;
 
+    void readRSSAtom(NodeList nodeList) {
+        for (int i = 0; i < nodeList.getLength(); i++) {
+
+            Element entry = (Element) nodeList.item(i);
+
+            Element _titleElement = (Element) entry.getElementsByTagName(
+                    "title").item(0);
+            Element _descriptionElement = (Element) entry
+                    .getElementsByTagName("summary").item(0);
+            Element _pubDateElement = (Element) entry
+                    .getElementsByTagName("published").item(0);
+            Element _linkElement = (Element) entry.getElementsByTagName(
+                    "link").item(0);
+
+            String _title;
+            try {
+                _title = _titleElement.getFirstChild().getNodeValue();
+            } catch (NullPointerException e) {
+                _title = "";
+            }
+            String _description;
+            try {
+
+                _description = _descriptionElement.getFirstChild().getNodeValue();
+            } catch (NullPointerException e) {
+                _description = "";
+            }
+
+            Date _pubDate;
+            try {
+                _pubDate = new Date(_pubDateElement.getFirstChild().getNodeValue());
+            } catch (Exception e) {
+                _pubDate = new Date();
+            }
+
+            String _link;
+            try {
+                _link = _linkElement.getFirstChild().getNodeValue();
+            } catch (NullPointerException e) {
+                _link = "";
+            }
+
+            RSSItem rssItem = new RSSItem(_title, _description, _pubDate, _link);
+            list.add(rssItem);
+        }
+    }
+
+    void readRSSOther(NodeList nodeList) {
+        for (int i = 0; i < nodeList.getLength(); i++) {
+
+            Element entry = (Element) nodeList.item(i);
+
+            Element _titleElement = (Element) entry.getElementsByTagName(
+                    "title").item(0);
+            Element _descriptionElement = (Element) entry
+                    .getElementsByTagName("description").item(0);
+            Element _pubDateElement = (Element) entry
+                    .getElementsByTagName("pubDate").item(0);
+            Element _linkElement = (Element) entry.getElementsByTagName(
+                    "link").item(0);
+
+            String _title;
+            try {
+                _title = _titleElement.getFirstChild().getNodeValue();
+            } catch (NullPointerException e) {
+                _title = "";
+            }
+            String _description;
+            try {
+
+                _description = _descriptionElement.getFirstChild().getNodeValue();
+            } catch (NullPointerException e) {
+                _description = "";
+            }
+            Date _pubDate = new Date(_pubDateElement.getFirstChild().getNodeValue());
+
+            String _link;
+            try {
+                _link = _linkElement.getFirstChild().getNodeValue();
+            } catch (NullPointerException e) {
+                _link = "";
+            }
+
+            RSSItem rssItem = new RSSItem(_title, _description, _pubDate, _link);
+            list.add(rssItem);
+        }
+    }
+
 
     public class MyTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -60,46 +148,19 @@ public class MyActivity extends Activity {
                         NodeList nodeList = element.getElementsByTagName("item");
 
                         if (nodeList.getLength() > 0) {
-                            for (int i = 0; i < nodeList.getLength(); i++) {
-
-                                Element entry = (Element) nodeList.item(i);
-
-                                Element _titleElement = (Element) entry.getElementsByTagName(
-                                        "title").item(0);
-                                Element _descriptionElement = (Element) entry
-                                        .getElementsByTagName("description").item(0);
-                                Element _pubDateElement = (Element) entry
-                                        .getElementsByTagName("pubDate").item(0);
-                                Element _linkElement = (Element) entry.getElementsByTagName(
-                                        "link").item(0);
-
-                                String _title;
-                                try {
-                                    _title = _titleElement.getFirstChild().getNodeValue();
-                                } catch (NullPointerException e) {
-                                    _title = "";
-                                }
-                                String _description;
-                                try {
-
-                                    _description = _descriptionElement.getFirstChild().getNodeValue();
-                                } catch (NullPointerException e) {
-                                    _description = "";
-                                }
-                                Date _pubDate = new Date(_pubDateElement.getFirstChild().getNodeValue());
-
-                                String _link;
-                                try {
-                                    _link = _linkElement.getFirstChild().getNodeValue();
-                                } catch (NullPointerException e) {
-                                    _link = "";
-                                }
-
-                                RSSItem rssItem = new RSSItem(_title, _description, _pubDate, _link);
-                                list.add(rssItem);
+                            readRSSOther(nodeList);
+                        } else {
+                            nodeList = element.getElementsByTagName("entry");
+                            if (nodeList.getLength() > 0) {
+                                readRSSAtom(nodeList);
+                            } else {
+                                Toast.makeText(getApplicationContext(), "Ошибка чтения RSS канала", 2000);
                             }
                         }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Ошибка HTTPConnection", 2000);
                     }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ParserConfigurationException e) {
@@ -107,13 +168,17 @@ public class MyActivity extends Activity {
                 } catch (SAXException e) {
                     e.printStackTrace();
                 }
-            } catch (IOException e) {
+            } catch (
+                    IOException e
+                    )
+
+            {
                 e.printStackTrace();
-            } finally {
-                try {
+            } finally
+
+            {
+                if (httpCon != null) {
                     httpCon.disconnect();
-                } catch (NullPointerException e){
-                    e.printStackTrace();
                 }
             }
 
@@ -147,7 +212,7 @@ public class MyActivity extends Activity {
         final EditText editText = (EditText) findViewById(R.id.editText);
 
         try {
-            url = new URL("http://news.yandex.ru/world.rss");
+            url = new URL("http://stackoverflow.com/feeds/tag/android");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

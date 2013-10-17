@@ -3,17 +3,6 @@ package com.ifmoctd.korolyov.RSSReader;
 import android.app.Activity;
 import android.os.Bundle;
 import android.webkit.WebView;
-import android.widget.TextView;
-
-import java.net.URLEncoder;
-
-/**
- * Created with IntelliJ IDEA.
- * User: Alexei
- * Date: 15.10.13
- * Time: 15:44
- * To change this template use File | Settings | File Templates.
- */
 public class RSSItemActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
