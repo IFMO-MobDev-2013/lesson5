@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.*;
 import org.w3c.dom.Document;
@@ -33,6 +34,10 @@ public class MyActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+
+        final EditText editText = (EditText) findViewById(R.id.editText);
+        final Button getButton = (Button) findViewById(R.id.button);
+        final LinearLayout upLayout = (LinearLayout)findViewById(R.id.upLayout);
         ListView listView = (ListView) findViewById(R.id.listView1);
         articleNames = new ArrayList<String>();
         adapter = new ArrayAdapter<String>(this, R.layout.list_item, articleNames);
@@ -47,8 +52,13 @@ public class MyActivity extends Activity {
             }
         });
 
-        new RSSDownloader().execute(getResources().getString(R.string.RSSAdress));
-
+        getButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new RSSDownloader().execute(editText.getText().toString());
+                //upLayout.removeView(getButton);
+            }
+        });
     }
 
     class RSSDownloader extends AsyncTask<String, Void, ArrayList<Article>> {
@@ -70,6 +80,7 @@ public class MyActivity extends Activity {
 
         @Override
         protected void onPostExecute(ArrayList<Article> articles) {
+            articleNames.clear();
             for (int i = 0; i < articles.size(); i++){
                 articleNames.add(articles.get(i).title);
             }
@@ -98,6 +109,10 @@ class DOMParser {
 
             Element root = doc.getDocumentElement();
             NodeList items = root.getElementsByTagName(Article.articleTag);
+            if (items.getLength() == 0){
+                Article.changeType();
+                items = root.getElementsByTagName(Article.articleTag);
+            }
             for (int i = 0; i < items.getLength(); i++){
                 Article ar = new Article();
                 Node item = items.item(i);
@@ -134,12 +149,32 @@ class DOMParser {
 }
 
 class Article {
-    final static String articleTag = "entry";
+    static String articleTag = "entry";
     String url;
-    final static String ulrTag = "id";
+    static String ulrTag = "id";
     String title;
-    final static String titleTag = "title";
+    static String titleTag = "title";
     String date;
-    final static String dateTag = "published";
+    static String dateTag = "published";
+    public static void setType(String s){
+        if (s == "entry"){
+            articleTag = "entry";
+            ulrTag = "id";
+            titleTag = "title";
+            dateTag = "published";
+        } else if (s == "item"){
+            articleTag = "item";
+            ulrTag = "link";
+            titleTag = "title";
+            dateTag = "pubDate";
+        }
+    }
+    public static void changeType(){
+        if (articleTag == "entry"){
+            setType("item");
+        } else {
+            setType("entry");
+        }
+    }
 
 }

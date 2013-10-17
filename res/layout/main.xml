@@ -2,8 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-        >
+              android:layout_height="fill_parent">
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/upLayout">
+
+        <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/RSSAdress"
+                android:id="@+id/editText"
+                android:layout_gravity="left|center_vertical"
+                android:hint="enter RSS adress"
+                android:layout_weight="1"/>
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="Get"
+                android:id="@+id/button"
+                />
+    </LinearLayout>
 
     <ListView
             android:layout_width="wrap_content"
