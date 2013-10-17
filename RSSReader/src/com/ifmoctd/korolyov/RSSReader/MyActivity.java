@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -53,12 +54,13 @@ public class MyActivity extends Activity {
             } catch (NullPointerException e) {
                 _title = "";
             }
-            String _description;
+            String _description = "";
             try {
-
-                _description = _descriptionElement.getFirstChild().getNodeValue();
+                for (Node node = _descriptionElement.getFirstChild(); node != null; node = node.getNextSibling()) {
+                    _description = _description + node.getNodeValue();
+                }
             } catch (NullPointerException e) {
-                _description = "";
+                e.printStackTrace();
             }
 
             Date _pubDate;
@@ -100,12 +102,13 @@ public class MyActivity extends Activity {
             } catch (NullPointerException e) {
                 _title = "";
             }
-            String _description;
+            String _description = "";
             try {
-
-                _description = _descriptionElement.getFirstChild().getNodeValue();
+                for (Node node = _descriptionElement.getFirstChild(); node != null; node = node.getNextSibling()) {
+                    _description = _description + node.getNodeValue();
+                }
             } catch (NullPointerException e) {
-                _description = "";
+                e.printStackTrace();
             }
             Date _pubDate = new Date(_pubDateElement.getFirstChild().getNodeValue());
 
