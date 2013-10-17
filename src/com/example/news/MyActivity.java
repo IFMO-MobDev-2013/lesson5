@@ -135,7 +135,7 @@ public class MyActivity extends Activity {
         arrayAdapter = new ArrayAdapter<Rss>(this, R.layout.list_item, rssItems);
         final Button button = (Button) findViewById(R.id.button);
         final EditText editText = (EditText) findViewById(R.id.editText);
-        editText.setText("http://stackoverflow.com/feeds/tag/android");
+        editText.setText("http://news.yandex.ru/world.rss");
         try {
             url = new URL(editText.getText().toString());
             refresh();
