@@ -7,5 +7,6 @@
     <string name="button_text">Получить RSS</string>
     <string name="hint">Введите адрес RSS-ленты</string>
     <string name="load">Загрузка...</string>
+    <string name="cont">Перейти на сайт</string>
 
 </resources>

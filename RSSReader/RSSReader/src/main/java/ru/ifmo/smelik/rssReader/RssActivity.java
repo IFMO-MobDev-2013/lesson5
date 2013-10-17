@@ -35,6 +35,15 @@ import ru.ifmo.smelik.rss.R;
  */
 public class RssActivity extends Activity {
 
+    private static final String TITLE = "title";
+    private static final String SUMMARY = "summary";
+    private static final String PUBLISHED = "published";
+    private static final String LINK = "link";
+    private static final String DESCRIPTION = "description";
+    private static final String PUBDATE = "pubDate";
+    private static final String ITEM = "item";
+    private static final String ENTRY = "entry";
+
     public static RssItem selectedRssItem = null;
     String feedUrl = "";
     ListView rssListView = null;
@@ -49,10 +58,10 @@ public class RssActivity extends Activity {
         for (int i = 0; i < nodeList.getLength(); i++) {
             Element entry = (Element) nodeList.item(i);
 
-            Element _titleE = (Element) entry.getElementsByTagName("title").item(0);
-            Element _descriptionE = (Element) entry.getElementsByTagName("summary").item(0);
-            Element _pubDateE = (Element) entry.getElementsByTagName("published").item(0);
-            Element _linkE = (Element) entry.getElementsByTagName("link").item(0);
+            Element _titleE = (Element) entry.getElementsByTagName(TITLE).item(0);
+            Element _descriptionE = (Element) entry.getElementsByTagName(SUMMARY).item(0);
+            Element _pubDateE = (Element) entry.getElementsByTagName(PUBLISHED).item(0);
+            Element _linkE = (Element) entry.getElementsByTagName(LINK).item(0);
 
             String _title;
             try {
@@ -91,10 +100,10 @@ public class RssActivity extends Activity {
         for (int i = 0; i < nodeList.getLength(); i++) {
 
             Element entry = (Element) nodeList.item(i);
-            Element _titleE = (Element) entry.getElementsByTagName("title").item(0);
-            Element _descriptionE = (Element) entry.getElementsByTagName("description").item(0);
-            Element _pubDateE = (Element) entry.getElementsByTagName("pubDate").item(0);
-            Element _linkE = (Element) entry.getElementsByTagName("link").item(0);
+            Element _titleE = (Element) entry.getElementsByTagName(TITLE).item(0);
+            Element _descriptionE = (Element) entry.getElementsByTagName(DESCRIPTION).item(0);
+            Element _pubDateE = (Element) entry.getElementsByTagName(PUBDATE).item(0);
+            Element _linkE = (Element) entry.getElementsByTagName(LINK).item(0);
 
             String _title;
             try {
@@ -155,12 +164,12 @@ public class RssActivity extends Activity {
                         Document document = db.parse(is);
                         Element element = document.getDocumentElement();
 
-                        NodeList nodeList = element.getElementsByTagName("item");
+                        NodeList nodeList = element.getElementsByTagName(ITEM);
 
                         if (nodeList.getLength() > 0) {
                             getRss(nodeList);
                         } else {
-                            nodeList = element.getElementsByTagName("entry");
+                            nodeList = element.getElementsByTagName(ENTRY);
                             if (nodeList.getLength() > 0) {
                                 getAtomRss(nodeList);
                             }

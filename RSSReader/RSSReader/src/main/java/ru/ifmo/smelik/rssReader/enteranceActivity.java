@@ -11,6 +11,7 @@ import ru.ifmo.smelik.rss.R;
 
 public class enteranceActivity extends Activity {
 
+    private static final String HTTP = "http://";
     String uri = "";
 
     @Override
@@ -28,10 +29,10 @@ public class enteranceActivity extends Activity {
             @Override
             public void onClick(View v) {
                 uri = url.getText().toString();
-                if (uri.substring(0, 7).equals("http://")) {
+                if (uri.substring(0, 7).equals(HTTP)) {
                     transferUrl.putExtra("URL", uri);
                 } else {
-                    transferUrl.putExtra("URL", "http://" + uri);
+                    transferUrl.putExtra("URL", HTTP + uri);
                 }
                 startActivity(transferUrl);
             }

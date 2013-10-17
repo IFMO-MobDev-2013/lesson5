@@ -22,7 +22,7 @@ public class RssItemDisplayer extends Activity {
 
         String title = selectedRssItem.toString();
         String content = "<b>" + title + "</b>" + "<br>" + "<br>" + selectedRssItem.getDescription()
-                + "<br>" + "<a href=\"" + selectedRssItem.getLink() + "\">Continue</a>";
+                + "<br>" + "<a href=\"" + selectedRssItem.getLink() + "\">"+ getString(R.string.cont) + "</a>";
 
         WebView wb = (WebView) findViewById(R.id.webView);
 

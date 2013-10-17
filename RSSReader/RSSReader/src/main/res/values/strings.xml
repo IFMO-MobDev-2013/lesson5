@@ -7,5 +7,6 @@
     <string name="button_text">Fetch RSS</string>
     <string name="hint">Input URL address of RSS</string>
     <string name="load">Loading...</string>
+    <string name="cont">Go to the website</string>
 
 </resources>
