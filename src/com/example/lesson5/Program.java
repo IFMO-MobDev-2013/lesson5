@@ -8,6 +8,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.util.Vector;
 
@@ -25,7 +29,103 @@ public class Program extends Activity
         list_view.setAdapter(adapter);
     }
 
-    public void onRssLoaded(XmlDocument target)
+    public void onException(final Exception e)
+    {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((ProgressBar)findViewById(R.id.progressBar)).setVisibility(ProgressBar.INVISIBLE);
+                Console.print("Exception: "+e.getMessage());
+            }
+        });
+    }
+
+    public void onRssLoaded(Document target)
+    {
+        Element root = target.getDocumentElement();
+        Console.print("Root "+root.getTagName());
+        if (target.getElementsByTagName("channel").getLength() > 0)
+        {
+            Console.print("Channel");
+            NodeList nodes = root.getElementsByTagName("item");
+            for (int i = 0; i < nodes.getLength(); ++i)
+            {
+                Entry entry = parseItem(nodes.item(i));
+                Console.print(nodes.item(i).getNodeName());
+                Console.print("Item ("+entry.link+"): "+entry.title);
+                adapter.entries.add(entry);
+            }
+        }
+        else if (target.getElementsByTagName("feed").getLength() > 0)
+        {
+            Console.print("Feed");
+            NodeList nodes = root.getElementsByTagName("entry");
+            for (int i = 0; i < nodes.getLength(); ++i)
+            {
+                Entry entry = parseEntry(nodes.item(i));
+                Console.print(nodes.item(i).getNodeName());
+                Console.print("Entry ("+entry.link+"): "+entry.title);
+                adapter.entries.add(entry);
+            }
+        }
+
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((ProgressBar)findViewById(R.id.progressBar)).setVisibility(ProgressBar.INVISIBLE);
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public Entry parseEntry(Node item)
+    {
+        Entry temp = new Entry();
+        NodeList list = item.getChildNodes();
+        for (int i = 0; i < list.getLength(); ++i)
+        {
+            Node c = list.item(i);
+            if (c.getNodeName().equals(""))
+            {
+                continue;
+            }
+            if (c.getNodeName().equals("title"))
+            {
+                temp.title = c.getFirstChild().getNodeValue();
+            }
+            else if (c.getNodeName().equals("link"))
+            {
+                temp.link = ((Element)c).getAttribute("href");
+            }
+        }
+        return temp;
+    }
+
+    public Entry parseItem(Node item)
+    {
+        Entry temp = new Entry();
+        NodeList list = item.getChildNodes();
+        for (int i = 0; i < list.getLength(); ++i)
+        {
+            Node c = list.item(i);
+            if (c.getNodeName().equals(""))
+            {
+                continue;
+            }
+            if (c.getNodeName().equals("title"))
+            {
+                temp.title = c.getFirstChild().getNodeValue();
+            }
+            else if (c.getNodeName().equals("link"))
+            {
+                temp.link = c.getFirstChild().getNodeValue();
+            }
+        }
+        return temp;
+    }
+
+    /*public void onRssLoaded(XmlDocument target)
     {
         Console.print("Rss loaded");
         //Vector<Entry> e = new Vector<Entry>();
@@ -59,7 +159,7 @@ public class Program extends Activity
                 adapter.notifyDataSetChanged();
             }
         });
-    }
+    }*/
 
     public void onClick(View v)
     {
