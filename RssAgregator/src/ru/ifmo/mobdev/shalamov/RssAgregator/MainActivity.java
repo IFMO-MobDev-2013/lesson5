@@ -41,10 +41,10 @@ public class MainActivity extends Activity {
 //                ((RadioButton)v).setO
 
             case R.id.radioButton1:
-                editText.setText("http://lenta.ru/rss");
+                editText.setText("http://habrahabr.ru/rss/hubs/");
                 break;
             case R.id.radioButton2:
-                editText.setText("http://habrahabr.ru/rss/hubs/");
+                editText.setText("http://lenta.ru/rss");
                 break;
             case R.id.radioButton3:
                 editText.setText("http://stackoverflow.com/feeds/tag/android");
