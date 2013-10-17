@@ -1,4 +1,6 @@
 package com.example.news;
+import android.provider.ContactsContract;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -42,7 +44,7 @@ public class Rss {
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd - hh:mm:ss");
 
-        String result = getTitle() + "  ( " + sdf.format(this.getPubDate()) + " )";
+        String result = getTitle() + "  ( " + sdf.format(getPubDate()) + " )";
         return result;
     }
 

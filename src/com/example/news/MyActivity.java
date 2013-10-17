@@ -38,6 +38,12 @@ public class MyActivity extends Activity {
                 conn = (HttpURLConnection) url.openConnection();
 
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    String tag_item="";
+                    String tag_title="";
+                    String tag_description="";
+                    String tag_pudDate="";
+                    String tag_link="";
+
                     InputStream is = conn.getInputStream();
 
                     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -45,24 +51,58 @@ public class MyActivity extends Activity {
 
                     Document document = db.parse(is);
                     Element element = document.getDocumentElement();
-
                     NodeList nodeList = element.getElementsByTagName("item");
+                    if (nodeList.getLength()>0){
+                        tag_item="item";
+                        tag_title="title";
+                        tag_description="description";
+                        tag_pudDate="pubDate";
+                        tag_link="link";
+                    }else
+                    {
+                        nodeList = element.getElementsByTagName("entry");
+                        tag_item="entry";
+                        tag_title="title";
+                        tag_description="summary";
+                        tag_pudDate="updated";
+                        tag_link="link";
+                    }
+
 
                     if (nodeList.getLength() > 0) {
                         for (int i = 0; i < nodeList.getLength(); i++) {
 
                             Element entry = (Element) nodeList.item(i);
 
-                            Element _titleE = (Element) entry.getElementsByTagName("title").item(0);
-                            Element _descriptionE = (Element) entry.getElementsByTagName("description").item(0);
-                            Element _pubDateE = (Element) entry.getElementsByTagName("pubDate").item(0);
-                            Element _linkE = (Element) entry.getElementsByTagName("link").item(0);
+                            Element _titleE = (Element) entry.getElementsByTagName(tag_title).item(0);
+                            Element _descriptionE = (Element) entry.getElementsByTagName(tag_description).item(0);
+                            Element _pubDateE = (Element) entry.getElementsByTagName(tag_pudDate).item(0);
+                            Element _linkE = (Element) entry.getElementsByTagName(tag_link).item(0);
+                            String _title = "";
+                            String _description = "";
+                            Date _pubDate =new Date();
+                            String _link = "";
+                            try{
+                            _title = _titleE.getFirstChild().getNodeValue();
+                            }catch (Exception e)
+                            {
 
-                            String _title = _titleE.getFirstChild().getNodeValue();
-                            String _description = _descriptionE.getFirstChild().getNodeValue();
-                            Date _pubDate = new Date(_pubDateE.getFirstChild().getNodeValue());
-                            String _link = _linkE.getFirstChild().getNodeValue();
+                            }
+                            try{
+                            _description = _descriptionE.getFirstChild().getNodeValue();
+                            }catch (Exception e){
 
+                            }
+                            try{
+                            _pubDate = new Date(_pubDateE.getFirstChild().getNodeValue());
+                            }catch (Exception e){
+
+                            }
+                            try {
+                            _link = _linkE.getFirstChild().getNodeValue();
+                            }catch (Exception e){
+
+                            }
                             Rss rssItem = new Rss(_title, _description, _pubDate, _link);
 
                             rssItems.add(rssItem);
@@ -95,7 +135,7 @@ public class MyActivity extends Activity {
         arrayAdapter = new ArrayAdapter<Rss>(this, R.layout.list_item, rssItems);
         final Button button = (Button) findViewById(R.id.button);
         final EditText editText = (EditText) findViewById(R.id.editText);
-        editText.setText("http://news.yandex.ru/world.rss");
+        editText.setText("http://stackoverflow.com/feeds/tag/android");
         try {
             url = new URL(editText.getText().toString());
             refresh();
@@ -108,6 +148,8 @@ public class MyActivity extends Activity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                rssItems.clear();
+                rsslistView.setAdapter(arrayAdapter);
                 try {
                     url = new URL(editText.getText().toString());
                     refresh();
