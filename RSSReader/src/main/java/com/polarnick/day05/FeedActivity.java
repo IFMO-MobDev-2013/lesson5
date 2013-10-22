@@ -36,8 +36,7 @@ public class FeedActivity extends Activity {
 
     private void loadFeed() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("Loading Feed");
-        progressDialog.setMessage("Please Wait...");
+        progressDialog.setMessage("Loading Feed...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
