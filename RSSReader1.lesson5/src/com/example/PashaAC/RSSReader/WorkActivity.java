@@ -30,30 +30,25 @@ public class WorkActivity extends Activity {
     TextView message;
     ArrayList<Articles> rssArticles = new ArrayList<Articles>();
     ArrayAdapter<Articles> arrayAdapter;
-    String myText = "";
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rss);
-
         message = (TextView) findViewById(R.id.textView);
         listView = (ListView) findViewById(R.id.listView);
 
         arrayAdapter = new ArrayAdapter<Articles>(this,	android.R.layout.simple_list_item_1, rssArticles);
         listView.setAdapter(arrayAdapter);
-        rssArticles.clear();
         new MainWork(getIntent().getStringExtra("key").toString()).execute();
-        //new MainWork("http://news.yandex.ru/computers.rss").execute();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
            public void onItemClick(AdapterView<?> adapterView, View view, int index, long number) {
                Intent intent = new Intent(WorkActivity.this, ThisArticle.class);
-               intent.putExtra("key2", rssArticles.get(index).getDescription() + "[][][]" + rssArticles.get(index).getLink());
+               intent.putExtra("Description", rssArticles.get(index).getDescription());
+               intent.putExtra("Title", rssArticles.get(index).getTitle());
+               intent.putExtra("PubDate", rssArticles.get(index).getPubDate());
                startActivity(intent);
             }
         });
-
     }
 
     class MainWork extends AsyncTask<Void, Void, String >  {
@@ -76,85 +71,83 @@ public class WorkActivity extends Activity {
                 httpConnection.setConnectTimeout(15000);
                 if (httpConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
                     throw new Exception("Bad connect");
-                /*
-                BufferedReader buffReader = new BufferedReader(new InputStreamReader(httpConnection.getInputStream()));
-                String text = "";
-                String line;
-                while ((line = buffReader.readLine()) != null) {
-                    text = text + line;
-                }
-                return text;
-                */
                 SAXParserFactory factory = SAXParserFactory.newInstance();
                 SAXParser saxParser = factory.newSAXParser();
                 DefaultHandler handler = new DefaultHandler() {
                     boolean isTitle = false;
                     boolean isDescription = false;
-                    boolean isURL = false;
                     boolean isLink = false;
                     boolean isPubDate = false;
 
                     String title = "";
                     String description = "";
-                    String url = "";
                     String link = "";
                     String pubdate = "";
+
+                    @Override
+                    public void startDocument() throws SAXException {
+                        super.startDocument();
+                    }
 
                     @Override
                     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException {
                         super.startElement(uri, localName, name, attributes);
                         if (name.equalsIgnoreCase("TITLE")) {
+                            title = "";
                             isTitle = true;
                         }
-                        if (name.equalsIgnoreCase("Description")) {
+                        if (name.equalsIgnoreCase("DESCRIPTION")) {
+                            description = "";
                             isDescription = true;
                         }
-                        if (name.equalsIgnoreCase("URL")) {
-                            isURL = true;
-                        }
                         if (name.equalsIgnoreCase("LINK")) {
+                            link = "";
                             isLink = true;
                         }
                         if (name.equalsIgnoreCase("PUBDATE")) {
+                            pubdate = "";
                             isPubDate = true;
                         }
                     }
 
                     @Override
                     public void endElement(String uri, String localName,
-                                           String qName) throws SAXException {
-                        if (qName.equalsIgnoreCase("ITEM")) {
-                            isDescription = false;
-                            isURL = false;
-                            isLink = false;
-                            isPubDate = false;
+                                           String name) throws SAXException {
+                        if (name.equalsIgnoreCase("TITLE")) {
                             isTitle = false;
-                            Articles temporaryVariable = new Articles(title, description, url, link, pubdate);
+                        }
+                        if (name.equalsIgnoreCase("DESCRIPTION")) {
+                            isDescription = false;
+                        }
+                        if (name.equalsIgnoreCase("LINK")) {
+                            isLink = false;
+                        }
+                        if (name.equalsIgnoreCase("PUBDATE")) {
+                            isPubDate = false;
+                        }
+                        if (name.equalsIgnoreCase("ITEM")) {
+                            Articles temporaryVariable = new Articles(title, description, link, pubdate);
                             rssArticles.add(temporaryVariable);
                         }
                     }
                     @Override
                     public void characters(char chars[], int start, int length) throws SAXException {
                         if (isTitle == true) {
-                            title = new String(chars, start, length);
-                            isTitle = false;
+                            title += new String(chars, start, length);
                         }
                         if (isDescription == true) {
-                            description = new String(chars, start, length);
-                            isDescription = false;
-                        }
-                        if (isURL == true) {
-                            url = new String(chars, start, length);
-                            isURL = false;
+                            description += new String(chars, start, length);
                         }
                         if (isLink == true) {
-                            link = new String(chars, start, length);
-                            isLink = false;
+                            link += new String(chars, start, length);
                         }
                         if (isPubDate == true) {
-                            pubdate = new String(chars, start, length);
-                            isPubDate = false;
+                            pubdate += new String(chars, start, length);
                         }
+                    }
+                    @Override
+                    public void endDocument() throws SAXException {
+                        super.endDocument();
                     }
                 };
                 InputStream inputStream = httpConnection.getInputStream();
@@ -165,7 +158,7 @@ public class WorkActivity extends Activity {
                 return "Several articles for you ^^";
             } catch(Exception e) {
                 e.printStackTrace();
-                return "Some Warning =(";
+                return e.getMessage();
             }
         }
 

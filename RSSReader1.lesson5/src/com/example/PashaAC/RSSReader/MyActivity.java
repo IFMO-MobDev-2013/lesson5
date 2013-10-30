@@ -17,8 +17,6 @@ public class MyActivity extends Activity {
     ArrayList<String> sites = new ArrayList<String>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
@@ -38,13 +36,10 @@ public class MyActivity extends Activity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,	android.R.layout.simple_list_item_1, sites);
         listView.setAdapter(arrayAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
             public void onItemClick(AdapterView<?> adapterView, View view, int index, long number) {
-                EditText editText = (EditText) findViewById(R.id.editText);
-                char[] chars = new char[sites.get(index).length()];
-                for (int i = 0; i < sites.get(index).length(); i++)
-                    chars[i] = sites.get(index).charAt(i);
-                editText.setText(chars, 0, sites.get(index).length());
+                Intent intent = new Intent(MyActivity.this, WorkActivity.class);
+                intent.putExtra("key", sites.get(index));
+                startActivity(intent);
             }
         });
 
@@ -58,10 +53,6 @@ public class MyActivity extends Activity {
                 startActivity(intent);
             }
         });
-    }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 }
 
