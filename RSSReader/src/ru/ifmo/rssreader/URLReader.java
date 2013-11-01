@@ -21,12 +21,15 @@ public class URLReader {
             connection.connect();
             InputStream is = connection.getInputStream();
             List<Byte> bytes = new ArrayList<Byte>();
+			byte[] buffer = new byte[4096];
             while (true) {
-                int x = is.read();
-                if (x == -1) {
+                int res = is.read(buffer);
+                if (res == -1) {
                     break;
                 }
-                bytes.add((byte) x);
+				for(int i = 0; i < res; i++) {
+					bytes.add(buffer[i]);
+				}
             }
             byte[] byteArray = new byte[bytes.size()];
             for (int i = 0; i < byteArray.length; i++) {
