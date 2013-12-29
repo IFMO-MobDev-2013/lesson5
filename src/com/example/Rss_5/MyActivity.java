@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import org.xml.sax.Attributes;
@@ -209,6 +208,7 @@ public class MyActivity extends Activity {
 
     void refresh() {
         Records.clear();
+        rsslistView.setAdapter(arrayAdapter);
         mt = new MyTask();
         mt.execute();
     }
