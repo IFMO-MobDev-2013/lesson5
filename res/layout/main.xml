@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:onClick="parseRss"
-            android:text="OK" >
+            android:text="@string/ok" >
     </Button>
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
