@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RSS</string>
+    <string name="ok">OK</string>
+    <string name="example">For example:</string>
+    <string name="url">http://news.yandex.ru/world.rss</string>
+    <string name="choose_rss">Choose RSS Channel</string>
+    <string name="wrong">Something is wrong</string>
+</resources>
